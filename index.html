@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JARDINERA ACE - Parking Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-glow: rgba(245, 158, 11, 0.4);
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --picker-height: 120px;
+            --item-height: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .glow-1 {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: pulse 10s infinite alternate;
+        }
+
+        .glow-2 {
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+            filter: blur(80px);
+            animation: pulse 15s infinite alternate-reverse;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.2) translate(5%, 5%);
+            }
+        }
+
+        .container {
+            max-width: 428px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        header {
+            padding: 1.5rem 0 0.75rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.15rem;
+        }
+
+        .highlight {
+            color: var(--primary);
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* Side-by-Side Layout */
+        .search-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            height: 120px;
+        }
+
+        .picker-container {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 1rem;
+            mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+        }
+
+        .picker-selection-overlay {
+            position: absolute;
+            top: 50%;
+            left: 0.5rem;
+            right: 0.5rem;
+            transform: translateY(-50%);
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.6rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .picker-wheel {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            cursor: grab;
+            user-select: none;
+            will-change: transform;
+        }
+
+        .picker-item {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: color 0.2s, font-size 0.2s;
+            width: 100%;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .picker-item.active {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .btn-search {
+            flex: 1;
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 1rem;
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            padding: 0.5rem;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .btn-search:active {
+            transform: scale(0.96);
+            filter: brightness(1.1);
+        }
+
+        .btn-search:disabled {
+            background: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .btn-search .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Results Grid */
+        .results-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            padding-bottom: 3rem;
+        }
+
+        .flight-card {
+            padding: 0.75rem;
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 1rem;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .flight-id {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .flight-time {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+        }
+
+        .card-body.detailed {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 2px;
+            height: 100px;
+        }
+
+        .card-body.minimalist {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            height: 100px;
+        }
+
+        .info-item {
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding-bottom: 2px;
+            width: 100%;
+        }
+
+        .card-body.minimalist .info-item {
+            text-align: center;
+            border: none;
+            width: auto;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.5rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .info-item span {
+            font-weight: 800;
+            font-size: 0.9rem;
+            line-height: 1.1;
+            display: block;
+        }
+
+        .card-body.minimalist .info-item label {
+            font-size: 0.65rem;
+        }
+
+        .card-body.minimalist .info-item span {
+            font-size: 2.2rem;
+        }
+
+        .val-flight {
+            color: var(--primary);
+            font-family: 'Montserrat';
+            font-size: 1rem !important;
+        }
+
+        .val-dest {
+            color: var(--text-main);
+            font-size: 1rem !important;
+        }
+
+        .val-belt {
+            color: var(--success);
+        }
+
+        .val-gate {
+            color: var(--accent);
+        }
+
+        .val-parking {
+            color: #fff;
+            background: rgba(245, 158, 11, 0.2);
+            padding: 1px 4px;
+            border-radius: 3px;
+            display: inline-block !important;
+        }
+
+        .card-body.minimalist .val-parking {
+            background: none;
+            color: var(--primary);
+            padding: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.3rem;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 0.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.35rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--glass-border);
+            font-weight: 700;
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-action.edit:active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .btn-action.delete:active {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .badge-passport {
+            background: #FFC700;
+            color: #000;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.6rem;
+            margin-top: 0.4rem;
+            display: inline-block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 360px;
+            padding: 1.75rem;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem 0.9rem;
+            border-radius: 0.7rem;
+            color: white;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .modal-pickers-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            height: 120px;
+        }
+
+        .modal-picker-item {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 0.75rem;
+        }
+
+        .btn-save {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 0.75rem;
+            background: var(--primary);
+            color: var(--bg-dark);
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--bg-dark);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            opacity: 0.2;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <header class="container">
+        <h1>JARDINERA <span class="highlight">ACE</span></h1>
+        <div class="subtitle">Airport Monitor</div>
+    </header>
+
+    <main class="container">
+        <div class="search-row">
+            <div class="picker-container glass" id="pickerContainer">
+                <div class="picker-selection-overlay"></div>
+                <div class="picker-wheel" id="parkingWheel"></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem; flex:1">
+                <button id="searchBtn" class="btn-search">
+                    <span class="icon">✈️</span>
+                    <span id="btnText">BUSCAR</span>
+                    <span id="btnSpinner" class="spinner" style="display:none"></span>
+                </button>
+                <button onclick="openManual()" class="btn-action glass"
+                    style="border-radius:1rem; height:38px; font-size:0.65rem; color:var(--text-main); font-weight:800; border-color:var(--primary)">+
+                    MANUAL</button>
+            </div>
+        </div>
+
+        <div id="resultsList" class="results-list">
+            <div class="empty-state"></div>
+        </div>
+    </main>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content glass">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 style="margin-bottom: 1.25rem; font-family: Montserrat; font-size: 1rem; text-align: center;">MODIFICAR
+                DATOS</h2>
+
+            <form id="editForm">
+                <div class="modal-pickers-row">
+                    <div style="display:flex; flex-direction:column; gap:0.3rem">
+                        <label
+                            style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">Parking</label>
+                        <div class="modal-picker-item" id="modalParkContainer">
+                            <div class="picker-selection-overlay" style="left:0.3rem; right:0.3rem"></div>
+                            <div class="picker-wheel" id="modalParkingWheel"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.3rem">
+                        <label
+                            style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">Puerta</label>
+                        <div class="modal-picker-item" id="modalGateContainer">
+                            <div class="picker-selection-overlay" style="left:0.3rem; right:0.3rem"></div>
+                            <div class="picker-wheel" id="modalGateWheel"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden inputs for non-manual fields to preserve them during edit -->
+                <input type="hidden" id="editID">
+                <input type="hidden" id="editOrigin">
+                <input type="hidden" id="editBelt">
+
+                <button type="submit" class="btn-save">GUARDAR</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const PROXY = 'https://api.allorigins.win/get?url=';
+        const ENDPOINTS = [
+            'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=L',
+            'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=S'
+        ];
+        const NON_SCHENGEN = ['ABZ', 'BFS', 'BHD', 'BHX', 'BLK', 'BOH', 'BRS', 'DSA', 'CWL', 'DND', 'EDI', 'EXT', 'GLA', 'HUY', 'INV', 'KOI', 'LCY', 'LDY', 'LGW', 'LHR', 'LLY', 'LTN', 'MAN', 'MME', 'NCL', 'NWI', 'NQY', 'PIK', 'SEN', 'SOU', 'STN', 'EMA', 'LONDON', 'MANCHESTER', 'UK', 'GB', 'DUBLIN', 'IE'];
+
+        let activeFlights = [];
+        let editingIdx = null;
+        let selectedParking = 7;
+
+        const STORAGE_KEY = 'JARDINERA_ACE_DATA';
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(activeFlights));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                activeFlights = JSON.parse(saved);
+                renderList();
+            }
+        }
+
+        class InfinitePicker {
+            constructor(wheelId, options) {
+                this.wheel = document.getElementById(wheelId);
+                this.options = options;
+                this.itemHeight = 40;
+                this.pickerHeight = 0; // Calculated in init
+                this.currentY = 0;
+                this.isDragging = false;
+                this.startY = 0;
+                this.velocity = 0;
+                this.lastY = 0;
+                this.lastTime = 0;
+
+                // For Infinite loop: clone options multiple times
+                this.loopCount = 5;
+                this.totalOptions = options.length;
+                this.fullList = [];
+                for (let i = 0; i < this.loopCount; i++) this.fullList.push(...options);
+
+                this.init();
+            }
+
+            init() {
+                this.fullList.forEach((opt, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'picker-item';
+                    div.textContent = opt;
+                    this.wheel.appendChild(div);
+                });
+
+                // Center initially at the middle set
+                this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
+                const midSetIdx = Math.floor(this.loopCount / 2) * this.totalOptions;
+                // Baseline compensation (-2px works best for Montserrat/bold)
+                this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
+                this.currentY = -midSetIdx * this.itemHeight;
+
+                this.update(false);
+
+                // Events
+                this.wheel.addEventListener('touchstart', e => this.onStart(e), { passive: false });
+                window.addEventListener('touchmove', e => this.onMove(e), { passive: false });
+                window.addEventListener('touchend', () => this.onEnd());
+
+                this.wheel.addEventListener('mousedown', e => this.onStart(e));
+                window.addEventListener('mousemove', e => this.onMove(e));
+                window.addEventListener('mouseup', () => this.onEnd());
+
+                // Mouse Wheel support
+                this.wheel.parentElement.addEventListener('wheel', e => {
+                    e.preventDefault();
+                    this.currentY -= Math.sign(e.deltaY) * this.itemHeight;
+                    this.onEnd(true);
+                });
+            }
+
+            refreshHeight() {
+                this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
+                this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
+                this.update(false);
+            }
+
+            onStart(e) {
+                this.isDragging = true;
+                const y = e.touches ? e.touches[0].pageY : e.pageY;
+                this.startY = y - this.currentY;
+                this.lastY = y;
+                this.lastTime = Date.now();
+                this.wheel.style.transition = 'none';
+            }
+
+            onMove(e) {
+                if (!this.isDragging) return;
+                const y = e.touches ? e.touches[0].pageY : e.pageY;
+                const now = Date.now();
+                const dt = now - this.lastTime;
+                if (dt > 0) this.velocity = (y - this.lastY) / dt;
+
+                this.currentY = y - this.startY;
+                this.lastY = y;
+                this.lastTime = now;
+                this.update(false);
+            }
+
+            onEnd(isWheel = false) {
+                if (!this.isDragging && !isWheel) return;
+                this.isDragging = false;
+
+                // Snap to nearest
+                let targetY = this.currentY;
+                if (!isWheel && Math.abs(this.velocity) > 0.1) {
+                    targetY += this.velocity * 150; // brief inertia
+                }
+
+                const index = Math.round(-targetY / this.itemHeight);
+                this.setIndex(index);
+            }
+
+            setIndex(idx) {
+                // Handle looping logic
+                const minIdx = this.totalOptions;
+                const maxIdx = (this.loopCount - 1) * this.totalOptions - 1;
+
+                if (idx < minIdx) idx += this.totalOptions;
+                if (idx > maxIdx) idx -= this.totalOptions;
+
+                this.currentY = -idx * this.itemHeight;
+                this.wheel.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                this.update(true);
+
+                this.selectedValue = this.options[idx % this.totalOptions];
+            }
+
+            // Method for programmatic sync
+            setSelectedValue(val) {
+                const optIdx = this.options.indexOf(Number(val));
+                if (optIdx === -1) return;
+                const midSetStart = Math.floor(this.loopCount / 2) * this.totalOptions;
+                this.setIndex(midSetStart + optIdx);
+            }
+
+            update(animated) {
+                this.wheel.style.transform = `translateY(${this.currentY + this.itemYOffset}px)`;
+
+                // Visual feedback (active item, 3D effect)
+                const centerIdx = Math.round(-this.currentY / this.itemHeight);
+                const items = this.wheel.querySelectorAll('.picker-item');
+
+                items.forEach((item, i) => {
+                    const dist = i - centerIdx;
+                    const isActive = dist === 0;
+                    item.classList.toggle('active', isActive);
+
+                    // Perspective transform
+                    const rotate = dist * 25;
+                    const translateZ = Math.abs(dist) * -10;
+                    const opacity = Math.max(0.1, 1 - Math.abs(dist) * 0.35);
+                    item.style.transform = `rotateX(${rotate}deg) translateZ(${translateZ}px)`;
+                    item.style.opacity = opacity;
+                });
+            }
+        }
+
+        let mainPicker, modalParkingPicker, modalGatePicker;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
+            const gates = Array.from({ length: 12 }, (_, i) => i + 1);
+
+            mainPicker = new InfinitePicker('parkingWheel', parkings);
+
+            // Modal Pickers
+            modalParkingPicker = new InfinitePicker('modalParkingWheel', parkings);
+            modalGatePicker = new InfinitePicker('modalGateWheel', gates);
+
+            loadData(); // Load saved flights
+
+            document.getElementById('searchBtn').addEventListener('click', handleSearch);
+            document.getElementById('editForm').addEventListener('submit', handleSave);
+
+            // Background Sync every 60 seconds
+            setInterval(runBackgroundSync, 60000);
+        });
+
+        async function fetchAena() {
+            const responses = await Promise.all(ENDPOINTS.map(url => fetch(PROXY + encodeURIComponent(url + '&t=' + Date.now()))));
+            const wrappers = await Promise.all(responses.map(r => r.json()));
+            return wrappers.flatMap(w => JSON.parse(w.contents));
+        }
+
+        async function runBackgroundSync() {
+            if (activeFlights.length === 0) return;
+            try {
+                const allData = await fetchAena();
+                let updated = false;
+
+                activeFlights.forEach(localFlight => {
+                    const match = allData.find(f => f.numVuelo === localFlight.id);
+                    if (match) {
+                        const newGate = match.puertaPrimera || '';
+                        const newBelt = match.cintaPrimera || '';
+                        if (localFlight.gate !== newGate || localFlight.belt !== newBelt) {
+                            localFlight.gate = newGate;
+                            localFlight.belt = newBelt;
+                            updated = true;
+                        }
+                    }
+                });
+
+                if (updated) {
+                    renderList();
+                    saveData();
+                }
+            } catch (err) { console.warn('Sync failed', err); }
+        }
+
+        async function handleSearch() {
+            setLoading(true);
+            try {
+                const allData = await fetchAena();
+
+                const searchParking = mainPicker.selectedValue;
+                const parkingStr = searchParking.toString();
+                const matches = allData.filter(f => {
+                    const stand = (f.cintaPrimera || f.puertaPrimera || f.mostradorDesde || '').toString();
+                    return stand.includes(parkingStr);
+                });
+
+                if (matches.length > 0) {
+                    matches.forEach(match => {
+                        const newFlight = {
+                            id: match.numVuelo || '',
+                            origin: match.ciudadIataOtro || '',
+                            parking: searchParking,
+                            gate: match.puertaPrimera || '',
+                            belt: match.cintaPrimera || '',
+                            type: 'search'
+                        };
+                        activeFlights.unshift(newFlight);
+                    });
+                    renderList();
+                    saveData();
+                } else {
+                    alert(`No se encontró actividad en el parking ${searchParking}.`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Fallo de conexión.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('searchBtn');
+            const spinner = document.getElementById('btnSpinner');
+            const text = document.getElementById('btnText');
+            btn.disabled = loading;
+            spinner.style.display = loading ? 'inline-block' : 'none';
+            text.style.display = loading ? 'none' : 'block';
+        }
+
+        function renderList() {
+            const list = document.getElementById('resultsList');
+            if (activeFlights.length === 0) {
+                list.innerHTML = '<div class="empty-state"></div>';
+                return;
+            }
+
+            list.innerHTML = activeFlights.map((f, i) => {
+                if (f.type === 'search') {
+                    return `
+                        <div class="flight-card glass">
+                            <div class="card-body detailed">
+                                <div class="info-item" style="display:flex; justify-content:space-between; align-items:center; border:none; width: 100%">
+                                    <span class="val-flight">${f.id || '---'}</span>
+                                    <span class="val-dest">${f.origin || '---'}</span>
+                                </div>
+                                <div class="info-item" style="width:100%"><label>PARKING</label><span class="val-parking">${f.parking}</span></div>
+                                <div class="info-item" style="width:100%"><label>GATE / PUERTA</label><span class="val-gate">${f.gate || '--'}</span></div>
+                                <div class="info-item" style="width:100%"><label>BELT / CINTA</label><span class="val-belt">${f.belt || '--'}</span></div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-action edit" onclick="openEdit(${i})">EDITAR</button>
+                                <button class="btn-action delete" onclick="removeFlight(${i})">BORRAR</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="flight-card glass">
+                            <div class="card-body minimalist">
+                                <div class="info-item">
+                                    <label>Parking</label>
+                                    <span class="val-parking">${f.parking}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Puerta</label>
+                                    <span class="val-gate">${f.gate || '--'}</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-action edit" onclick="openEdit(${i})">EDITAR</button>
+                                <button class="btn-action delete" onclick="removeFlight(${i})">BORRAR</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function removeFlight(i) {
+            activeFlights.splice(i, 1);
+            renderList();
+            saveData();
+        }
+
+        function openEdit(i) {
+            editingIdx = i;
+            const f = activeFlights[i];
+
+            // Preserve hidden values
+            document.getElementById('editID').value = f.id || '';
+            document.getElementById('editOrigin').value = f.origin || '';
+            document.getElementById('editBelt').value = f.belt || '';
+
+            modalParkingPicker.setSelectedValue(f.parking);
+            modalGatePicker.setSelectedValue(f.gate || 1);
+
+            document.getElementById('editModal').style.display = 'flex';
+
+            // Recalculate heights once visible
+            modalParkingPicker.refreshHeight();
+            modalGatePicker.refreshHeight();
+        }
+
+        function openManual() {
+            editingIdx = -1;
+            document.getElementById('editForm').reset();
+
+            modalParkingPicker.setSelectedValue(mainPicker.selectedValue);
+            modalGatePicker.setSelectedValue(1);
+
+            document.getElementById('editModal').style.display = 'flex';
+
+            // Recalculate heights once visible
+            modalParkingPicker.refreshHeight();
+            modalGatePicker.refreshHeight();
+        }
+
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; editingIdx = null; }
+
+        function handleSave(e) {
+            e.preventDefault();
+            if (editingIdx === null) return;
+
+            const data = {
+                id: document.getElementById('editID').value || '',
+                origin: document.getElementById('editOrigin').value || '',
+                belt: document.getElementById('editBelt').value || '',
+                parking: modalParkingPicker.selectedValue,
+                gate: modalGatePicker.selectedValue,
+            };
+
+            if (editingIdx === -1) {
+                data.type = 'manual';
+                activeFlights.unshift(data);
+            } else {
+                activeFlights[editingIdx] = { ...activeFlights[editingIdx], ...data };
+            }
+
+            renderList();
+            saveData();
+            closeModal();
+        }
+    </script>
+</body>
+
+</html>
