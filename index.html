@@ -10,6 +10,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
         rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
     <style>
         :root {
             --primary: #f59e0b;
@@ -145,6 +147,8 @@
             position: relative;
             height: 100%;
             overflow: hidden;
+            touch-action: none;
+            overscroll-behavior: none;
             background: rgba(0, 0, 0, 0.25);
             border-radius: 1rem;
             mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
@@ -176,6 +180,7 @@
             margin: 0;
             cursor: grab;
             user-select: none;
+            touch-action: none;
             will-change: transform;
         }
 
@@ -476,6 +481,8 @@
             position: relative;
             height: 100%;
             overflow: hidden;
+            touch-action: none;
+            overscroll-behavior: none;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 0.75rem;
         }
@@ -676,6 +683,8 @@
             }
 
             onStart(e) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
                 this.isDragging = true;
                 const y = e.touches ? e.touches[0].pageY : e.pageY;
                 this.startY = y - this.currentY;
@@ -686,6 +695,8 @@
 
             onMove(e) {
                 if (!this.isDragging) return;
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
                 const y = e.touches ? e.touches[0].pageY : e.pageY;
                 const now = Date.now();
                 const dt = now - this.lastTime;
