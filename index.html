@@ -10,8 +10,13 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
         rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JARDINERA">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f172a%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>✈️</text></svg>">
     <style>
         :root {
             --primary: #f59e0b;
@@ -595,7 +600,11 @@
     </div>
 
     <script>
-        const PROXY = 'https://api.allorigins.win/get?url=';
+        const PROXIES = [
+            'https://api.allorigins.win/get?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
         const ENDPOINTS = [
             'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=L',
             'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=S'
@@ -790,9 +799,33 @@
         });
 
         async function fetchAena() {
-            const responses = await Promise.all(ENDPOINTS.map(url => fetch(PROXY + encodeURIComponent(url + '&t=' + Date.now()))));
-            const wrappers = await Promise.all(responses.map(r => r.json()));
-            return wrappers.flatMap(w => JSON.parse(w.contents));
+            let lastErr = '';
+            for (const proxyBase of PROXIES) {
+                try {
+                    const responses = await Promise.all(ENDPOINTS.map(url => {
+                        const targetUrl = url + '&t=' + Date.now();
+                        const finalUrl = proxyBase + encodeURIComponent(targetUrl);
+
+                        return fetch(finalUrl, {
+                            referrerPolicy: "no-referrer",
+                            cache: "no-store"
+                        }).then(r => {
+                            if (!r.ok) throw new Error(`${r.status}`);
+                            return r.json();
+                        });
+                    }));
+
+                    return responses.flatMap(w => {
+                        const content = w.contents || w;
+                        return typeof content === 'string' ? JSON.parse(content) : content;
+                    });
+                } catch (e) {
+                    lastErr = e.message;
+                    console.warn(`Proxy fail: ${proxyBase}`, e);
+                    continue;
+                }
+            }
+            throw new Error(`Servidores ocupados (${lastErr}). Prueba a cerrar y abrir la app.`);
         }
 
         async function runBackgroundSync() {
@@ -852,7 +885,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                alert('Fallo de conexión.');
+                alert('ERROR DE CONEXIÓN:\n' + err.message + '\n\nIntenta cambiar de Wi-Fi o usar datos móviles.');
             } finally {
                 setLoading(false);
             }
