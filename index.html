@@ -770,13 +770,14 @@
         let mainPicker, modalParkingPicker, modalGatePicker;
 
         document.addEventListener('DOMContentLoaded', () => {
-            const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
+            const mainParkings = Array.from({ length: 24 }, (_, i) => i + 1);
+            const modalParkings = Array.from({ length: 18 }, (_, i) => i + 7);
             const gates = Array.from({ length: 12 }, (_, i) => i + 1);
 
-            mainPicker = new InfinitePicker('parkingWheel', parkings);
+            mainPicker = new InfinitePicker('parkingWheel', mainParkings);
 
             // Modal Pickers
-            modalParkingPicker = new InfinitePicker('modalParkingWheel', parkings);
+            modalParkingPicker = new InfinitePicker('modalParkingWheel', modalParkings);
             modalGatePicker = new InfinitePicker('modalGateWheel', gates);
 
             loadData(); // Load saved flights
