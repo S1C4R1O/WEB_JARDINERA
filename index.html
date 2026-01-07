@@ -2,1451 +2,774 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>JARDINERA ACE - Parking Monitor</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
-    rel="stylesheet" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="JARDINERA" />
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
-  <link rel="apple-touch-icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f172a%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>✈️</text></svg>">
-  <style>
-    :root {
-      --primary: #f59e0b;
-      --primary-glow: rgba(245, 158, 11, 0.4);
-      --bg-dark: #0f172a;
-      --bg-card: rgba(30, 41, 59, 0.6);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #38bdf8;
-      --success: #10b981;
-      --danger: #ef4444;
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --picker-height: 120px;
-      --item-height: 40px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JARDINERA ACE - Parking Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
+        rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JARDINERA">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230f172a%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2270%22>✈️</text></svg>">
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-glow: rgba(245, 158, 11, 0.4);
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --danger: #ef4444;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --item-height: 40px;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      line-height: 1.5;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .bg-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      overflow: hidden;
-    }
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-    .glow-1 {
-      position: absolute;
-      top: -10%;
-      right: -10%;
-      width: 60vw;
-      height: 60vw;
-      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-      filter: blur(80px);
-      opacity: 0.5;
-    }
+        .glow-1 {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.5;
+        }
 
-    .glow-2 {
-      position: absolute;
-      bottom: -10%;
-      left: -10%;
-      width: 50vw;
-      height: 50vw;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
-      filter: blur(80px);
-      opacity: 0.4;
-    }
+        .glow-2 {
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.4;
+        }
 
-    .container {
-      max-width: 428px;
-      margin: 0 auto;
-      padding: 0 1rem;
-      width: 100%;
-    }
+        .container {
+            max-width: 428px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
 
-    header {
-      padding: 1.5rem 0 0.75rem;
-      text-align: center;
-    }
+        header {
+            padding: 1.5rem 0 0.75rem;
+            text-align: center;
+        }
 
-    h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.15rem;
-    }
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.15rem;
+        }
 
-    .highlight {
-      color: var(--primary);
-      text-transform: uppercase;
-      position: relative;
-      display: inline-block;
-    }
+        .highlight {
+            color: var(--primary);
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
 
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      opacity: 0.8;
-    }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
 
-    .glass {
-      background: var(--bg-card);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 1px solid var(--glass-border);
-      border-radius: 1.5rem;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-    }
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
 
-    .search-row {
-      display: flex;
-      align-items: stretch;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-      height: 120px;
-    }
+        /* BOTONES PRINCIPALES (solo añadir y limpiar) */
+        .actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+            height: 86px;
+        }
 
-    .picker-container {
-      flex: 1;
-      position: relative;
-      height: 100%;
-      overflow: hidden;
-      touch-action: none;
-      overscroll-behavior: none;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 1rem;
-      mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
-      -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
-    }
+        .btn-primary {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 1rem;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            line-height: 1.1;
+        }
 
-    .picker-selection-overlay {
-      position: absolute;
-      top: 50%;
-      left: 0.5rem;
-      right: 0.5rem;
-      transform: translateY(-50%);
-      height: 40px;
-      background: rgba(255, 255, 255, 0.08);
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 0.6rem;
-      pointer-events: none;
-      z-index: 2;
-    }
+        .btn-primary:active {
+            transform: scale(0.97);
+            filter: brightness(1.1);
+        }
 
-    .picker-wheel {
-      position: absolute;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0;
-      margin: 0;
-      cursor: grab;
-      user-select: none;
-      touch-action: none;
-      will-change: transform;
-    }
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            font-weight: 900;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            line-height: 1.1;
+        }
 
-    .picker-item {
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      transition: color 0.2s, font-size 0.2s;
-      width: 100%;
-      text-align: center;
-      line-height: 1.2;
-    }
+        .btn-secondary:active {
+            transform: scale(0.97);
+            border-color: rgba(255, 255, 255, 0.16);
+        }
 
-    .picker-item.active {
-      color: var(--primary);
-      font-size: 1.5rem;
-    }
+        .btn-icon {
+            font-size: 1.25rem;
+        }
 
-    .btn-search {
-      flex: 1;
-      background: var(--primary);
-      color: var(--bg-dark);
-      border: none;
-      border-radius: 1rem;
-      font-weight: 800;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.2rem;
-      padding: 0.5rem;
-      text-align: center;
-      line-height: 1.1;
-    }
+        /* Results Grid */
+        .results-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            padding-bottom: 3rem;
+        }
 
-    .btn-search:active {
-      transform: scale(0.96);
-      filter: brightness(1.1);
-    }
+        .flight-card {
+            padding: 0.75rem;
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 1rem;
+        }
 
-    .btn-search:disabled {
-      background: var(--text-muted);
-      opacity: 0.5;
-    }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
 
-    .btn-search .icon {
-      font-size: 1.2rem;
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .results-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      padding-bottom: 3rem;
-    }
+        .card-body.minimalist {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 1.5rem 0.5rem;
+        }
 
-    .flight-card {
-      padding: 0.75rem;
-      position: relative;
-      animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-      border-radius: 1rem;
-    }
+        .info-item {
+            text-align: center;
+            border: none;
+            width: auto;
+        }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
+        .info-item label {
+            display: block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        .info-item span {
+            font-weight: 900;
+            line-height: 1.1;
+            display: block;
+            font-size: 2.2rem;
+        }
 
-    .card-body.detailed {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      padding-bottom: 0.5rem;
-    }
+        .val-gate {
+            color: var(--accent);
+        }
 
-    .info-item {
-      text-align: left;
-      border: none;
-      overflow: hidden;
-    }
+        .val-parking {
+            color: var(--primary);
+        }
 
-    .info-item.full {
-      grid-column: span 2;
-    }
+        .card-actions {
+            display: flex;
+            gap: 0.3rem;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 0.5rem;
+            margin-top: 0.3rem;
+        }
 
-    .header-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      grid-column: span 2;
-      margin-bottom: 0.25rem;
-      gap: 0.5rem;
-    }
+        .btn-action {
+            flex: 1;
+            padding: 0.35rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--glass-border);
+            font-weight: 800;
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--text-muted);
+        }
 
-    .info-item label {
-      display: block;
-      font-size: 0.5rem;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      opacity: 0.7;
-    }
+        .btn-action.edit:active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+        }
 
-    .info-item span {
-      font-weight: 800;
-      font-size: 0.9rem;
-      line-height: 1.1;
-      display: block;
-    }
+        .btn-action.delete:active {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
 
-    .val-flight {
-      color: var(--primary);
-      font-family: 'Montserrat';
-      font-size: 0.9rem !important;
-      margin-top: -2px;
-    }
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            opacity: 0.25;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
 
-    .val-dest {
-      color: var(--text-main);
-      font-size: 1.1rem !important;
-      font-weight: 800;
-      text-align: right;
-    }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
 
-    .val-belt {
-      color: var(--success);
-    }
+        .modal-content {
+            width: 100%;
+            max-width: 360px;
+            padding: 1.75rem;
+            position: relative;
+        }
 
-    .val-gate {
-      color: var(--accent);
-    }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+        }
 
-    .val-parking {
-      color: #fff;
-      background: rgba(245, 158, 11, 0.2);
-      padding: 1px 4px;
-      border-radius: 3px;
-      display: inline-block !important;
-    }
+        .modal-pickers-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            height: 120px;
+        }
 
-    .val-type {
-      color: #fff;
-      background: rgba(56, 189, 248, 0.12);
-      padding: 1px 6px;
-      border-radius: 999px;
-      display: inline-block !important;
-      font-size: 0.7rem !important;
-      font-weight: 900 !important;
-    }
+        .picker-selection-overlay {
+            position: absolute;
+            top: 50%;
+            left: 0.3rem;
+            right: 0.3rem;
+            transform: translateY(-50%);
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.6rem;
+            pointer-events: none;
+            z-index: 2;
+        }
 
-    .val-status {
-      color: #fff;
-      background: rgba(148, 163, 184, 0.18);
-      padding: 1px 6px;
-      border-radius: 999px;
-      display: inline-block !important;
-      font-size: 0.7rem !important;
-      font-weight: 800 !important;
-    }
+        .modal-picker-item {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
+            overscroll-behavior: none;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 0.75rem;
+            mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+        }
 
-    .card-actions {
-      display: flex;
-      gap: 0.3rem;
-      border-top: 1px solid var(--glass-border);
-      padding-top: 0.5rem;
-      margin-top: 0.3rem;
-    }
+        .picker-wheel {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            will-change: transform;
+        }
 
-    .btn-action {
-      flex: 1;
-      padding: 0.35rem;
-      border-radius: 0.4rem;
-      border: 1px solid var(--glass-border);
-      font-weight: 700;
-      font-size: 0.55rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: transparent;
-      color: var(--text-muted);
-    }
+        .picker-item {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            transition: color 0.2s, font-size 0.2s;
+            width: 100%;
+            text-align: center;
+            line-height: 1.2;
+        }
 
-    .btn-action.edit:active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
-    }
+        .picker-item.active {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
 
-    .btn-action.delete:active {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: rgba(239, 68, 68, 0.1);
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(15px);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal-content {
-      width: 100%;
-      max-width: 360px;
-      padding: 1.75rem;
-      position: relative;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: none;
-      color: white;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .form-group {
-      margin-bottom: 0.75rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
-      text-transform: uppercase;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--glass-border);
-      padding: 0.75rem 0.9rem;
-      border-radius: 0.7rem;
-      color: white;
-      outline: none;
-      font-size: 0.95rem;
-    }
-
-    .btn-save {
-      width: 100%;
-      height: 50px;
-      border: none;
-      border-radius: 0.75rem;
-      background: var(--primary);
-      color: var(--bg-dark);
-      font-weight: 800;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(0, 0, 0, 0.1);
-      border-top: 3px solid var(--bg-dark);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 2rem 1rem;
-      opacity: 0.25;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .notice {
-      margin: 0.75rem 0 1rem;
-      padding: 0.75rem 0.9rem;
-      border-radius: 1rem;
-      border: 1px solid var(--glass-border);
-      background: rgba(0, 0, 0, 0.25);
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-  </style>
+        .btn-save {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 0.75rem;
+            background: var(--primary);
+            color: var(--bg-dark);
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="bg-glow">
-    <div class="glow-1"></div>
-    <div class="glow-2"></div>
-  </div>
-
-  <header class="container">
-    <h1>JARDINERA <span class="highlight">ACE</span></h1>
-    <div class="subtitle">Airport Monitor</div>
-  </header>
-
-  <main class="container">
-    <div class="search-row">
-      <div class="picker-container glass" id="pickerContainer">
-        <div class="picker-selection-overlay"></div>
-        <div class="picker-wheel" id="parkingWheel"></div>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:0.4rem; flex:1">
-        <button id="searchBtn" class="btn-search">
-          <span class="icon">✈️</span>
-          <span id="btnText">BUSCAR</span>
-          <span id="btnSpinner" class="spinner" style="display:none"></span>
-        </button>
-
-        <button onclick="openManual()" class="btn-action glass"
-          style="border-radius:1rem; height:38px; font-size:0.65rem; color:var(--text-main); font-weight:800; border-color:var(--primary)">
-          + MANUAL
-        </button>
-      </div>
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
     </div>
 
-    <div id="notice" class="notice" style="display:none"></div>
+    <header class="container">
+        <h1>JARDINERA <span class="highlight">ACE</span></h1>
+        <div class="subtitle">Airport Monitor</div>
+    </header>
 
-    <div id="resultsList" class="results-list">
-      <div class="empty-state">Selecciona un parking (stand) y pulsa BUSCAR.</div>
+    <main class="container">
+        <!-- SOLO BOTONES: AÑADIR / LIMPIAR -->
+        <div class="actions-row">
+            <button id="addBtn" class="btn-primary glass">
+                <span class="btn-icon">➕</span>
+                <span>AÑADIR</span>
+            </button>
+
+            <button id="clearBtn" class="btn-secondary glass">
+                <span class="btn-icon">🧹</span>
+                <span>LIMPIAR</span>
+            </button>
+        </div>
+
+        <div id="resultsList" class="results-list">
+            <div class="empty-state">Sin registros. Pulsa AÑADIR.</div>
+        </div>
+    </main>
+
+    <!-- MODAL (ruletas iPhone) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content glass">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 style="margin-bottom: 1.25rem; font-family: Montserrat; font-size: 1rem; text-align: center;">
+                PARKING / PUERTA
+            </h2>
+
+            <form id="editForm">
+                <div class="modal-pickers-row">
+                    <div style="display:flex; flex-direction:column; gap:0.3rem">
+                        <label
+                            style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">Parking</label>
+                        <div class="modal-picker-item" id="modalParkContainer">
+                            <div class="picker-selection-overlay"></div>
+                            <div class="picker-wheel" id="modalParkingWheel"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.3rem">
+                        <label
+                            style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">Puerta</label>
+                        <div class="modal-picker-item" id="modalGateContainer">
+                            <div class="picker-selection-overlay"></div>
+                            <div class="picker-wheel" id="modalGateWheel"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="editId" value="">
+
+                <button type="submit" class="btn-save">GUARDAR</button>
+            </form>
+        </div>
     </div>
-  </main>
 
-  <!-- Modal Manual -->
-  <div id="manualModal" class="modal">
-    <div class="modal-content glass">
-      <button class="modal-close" onclick="closeManual()">&times;</button>
-      <h2 style="margin-bottom: 1.1rem; font-family: Montserrat; font-size: 1rem; text-align: center;">
-        ENTRADA MANUAL
-      </h2>
+    <script>
+        /********************
+         * DATA (persistente)
+         ********************/
+        const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V2';
+        let entries = []; // { id:string, parking:number, gate:number, createdAt:number }
 
-      <form id="manualForm">
-        <div class="form-group">
-          <label>Parking (stand)</label>
-          <input id="manualParking" type="number" min="1" max="24" placeholder="Ej: 7" required />
-        </div>
-
-        <div class="form-group">
-          <label>Nº de vuelo (IATA)</label>
-          <input id="manualFlight" type="text" placeholder="Ej: NT123 / FR1234" required />
-        </div>
-
-        <div class="form-group">
-          <label>Tipo</label>
-          <select id="manualType" required>
-            <option value="AUTO">AUTO (buscar si es llegada o salida)</option>
-            <option value="L">LLEGADA</option>
-            <option value="S">SALIDA</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn-save">GUARDAR</button>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    /********************
-     * CONFIG
-     ********************/
-    const STORAGE_KEY = 'JARDINERA_ACE_DATA_V2';
-
-    // Proxies para saltar CORS (pueden fallar según el día)
-    const PROXIES = [
-      'https://api.allorigins.win/get?url=',
-      'https://corsproxy.io/?',
-      'https://api.codetabs.com/v1/proxy?quest='
-    ];
-
-    // Aena (Infovuelos) - endpoint histórico (si Aena responde devuelve JSON)
-    const AENA_ENDPOINTS = {
-      L: 'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=L',
-      S: 'https://www.aena.es/sites/Satellite?pagename=AENA_ConsultarVuelos&airport=ACE&flightType=S',
-    };
-
-    // Overpass (OSM) y OpenSky (ADS-B)
-    const OVERPASS_INTERPRETER = 'https://overpass-api.de/api/interpreter';
-    const OPENSKY_STATES_ALL = 'https://opensky-network.org/api/states/all';
-
-    // BBox aproximada ACE (para Overpass y OpenSky)
-    // Ajusta si quieres: cuanto más grande, más datos/consumo.
-    const ACE_BBOX = { latMin: 28.93, lonMin: -13.62, latMax: 28.97, lonMax: -13.58 };
-
-    // Umbral de distancia (metros) para considerar que un avión está en el stand
-    const STAND_MATCH_METERS = 160;
-
-    // Traducción ICAO callsign -> IATA (lo más común en ACE)
-    const ICAO_TO_IATA = {
-      RYR: 'FR', // Ryanair
-      EXS: 'LS', // Jet2
-      EZY: 'U2', // easyJet
-      BAW: 'BA', // British Airways
-      VLG: 'VY', // Vueling
-      IBS: 'I2', // Iberia Express
-      IBE: 'IB', // Iberia
-      AEA: 'UX', // Air Europa
-      TOM: 'BY', // TUI Airways (frecuente)
-      TUI: 'X3', // a veces (depende)
-      IBB: 'NT', // Binter (ICAO habitual)
-      BCS: 'D0', // DHL Aviation (ejemplo)
-    };
-
-    /********************
-     * STATE
-     ********************/
-    let activeFlights = [];
-    let selectedParking = 7;
-    let standMap = null; // { "7": {lat, lon, ref} ... }
-    let mainPicker;
-
-    /********************
-     * UI HELPERS
-     ********************/
-    function showNotice(msg) {
-      const el = document.getElementById('notice');
-      if (!msg) {
-        el.style.display = 'none';
-        el.textContent = '';
-        return;
-      }
-      el.style.display = 'block';
-      el.textContent = msg;
-    }
-
-    function setLoading(loading) {
-      const btn = document.getElementById('searchBtn');
-      const spinner = document.getElementById('btnSpinner');
-      const text = document.getElementById('btnText');
-      btn.disabled = loading;
-      spinner.style.display = loading ? 'inline-block' : 'none';
-      text.style.display = loading ? 'none' : 'block';
-    }
-
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(activeFlights));
-    }
-
-    function loadData() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          activeFlights = JSON.parse(saved) || [];
-        } catch {
-          activeFlights = [];
+        function newId() {
+            if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+            return 'id_' + Math.random().toString(16).slice(2) + Date.now().toString(16);
         }
-      }
-      renderList();
-    }
 
-    /********************
-     * PICKER (tu clase original, sin tocar estética)
-     ********************/
-    class InfinitePicker {
-      constructor(wheelId, options) {
-        this.wheel = document.getElementById(wheelId);
-        this.options = options;
-        this.itemHeight = 40;
-        this.pickerHeight = 0;
-        this.currentY = 0;
-        this.isDragging = false;
-        this.startY = 0;
-        this.velocity = 0;
-        this.lastY = 0;
-        this.lastTime = 0;
-        this.selectedValue = options[0];
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
 
-        this.loopCount = 5;
-        this.totalOptions = options.length;
-        this.fullList = [];
-        for (let i = 0; i < this.loopCount; i++) this.fullList.push(...options);
+        function loadData() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                const parsed = saved ? JSON.parse(saved) : [];
+                entries = Array.isArray(parsed) ? parsed : [];
+            } catch {
+                entries = [];
+            }
+            renderList();
+        }
 
-        this.init();
-      }
+        function clearAll() {
+            // (3) sin confirmación
+            entries = [];
+            localStorage.removeItem(STORAGE_KEY);
+            renderList();
+        }
 
-      init() {
-        this.fullList.forEach(opt => {
-          const div = document.createElement('div');
-          div.className = 'picker-item';
-          div.textContent = opt;
-          this.wheel.appendChild(div);
+        /********************
+         * PICKER (iPhone wheel)
+         ********************/
+        class InfinitePicker {
+            constructor(wheelId, options) {
+                this.wheel = document.getElementById(wheelId);
+                this.options = options;
+                this.itemHeight = 40;
+                this.pickerHeight = 0;
+                this.currentY = 0;
+                this.isDragging = false;
+                this.startY = 0;
+                this.velocity = 0;
+                this.lastY = 0;
+                this.lastTime = 0;
+                this.selectedValue = options[0];
+
+                this.loopCount = 5;
+                this.totalOptions = options.length;
+                this.fullList = [];
+                for (let i = 0; i < this.loopCount; i++) this.fullList.push(...options);
+
+                this.init();
+            }
+
+            init() {
+                this.wheel.innerHTML = '';
+                this.fullList.forEach((opt) => {
+                    const div = document.createElement('div');
+                    div.className = 'picker-item';
+                    div.textContent = opt;
+                    this.wheel.appendChild(div);
+                });
+
+                this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
+                const midSetIdx = Math.floor(this.loopCount / 2) * this.totalOptions;
+                this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
+                this.currentY = -midSetIdx * this.itemHeight;
+
+                this.update();
+
+                this.wheel.addEventListener('touchstart', e => this.onStart(e), { passive: false });
+                window.addEventListener('touchmove', e => this.onMove(e), { passive: false });
+                window.addEventListener('touchend', () => this.onEnd());
+
+                this.wheel.addEventListener('mousedown', e => this.onStart(e));
+                window.addEventListener('mousemove', e => this.onMove(e));
+                window.addEventListener('mouseup', () => this.onEnd());
+
+                this.wheel.parentElement.addEventListener('wheel', e => {
+                    e.preventDefault();
+                    this.currentY -= Math.sign(e.deltaY) * this.itemHeight;
+                    this.onEnd(true);
+                });
+            }
+
+            refreshHeight() {
+                this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
+                this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
+                this.update();
+            }
+
+            onStart(e) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+                this.isDragging = true;
+                const y = e.touches ? e.touches[0].pageY : e.pageY;
+                this.startY = y - this.currentY;
+                this.lastY = y;
+                this.lastTime = Date.now();
+                this.wheel.style.transition = 'none';
+            }
+
+            onMove(e) {
+                if (!this.isDragging) return;
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+                const y = e.touches ? e.touches[0].pageY : e.pageY;
+                const now = Date.now();
+                const dt = now - this.lastTime;
+                if (dt > 0) this.velocity = (y - this.lastY) / dt;
+
+                this.currentY = y - this.startY;
+                this.lastY = y;
+                this.lastTime = now;
+                this.update();
+            }
+
+            onEnd(isWheel = false) {
+                if (!this.isDragging && !isWheel) return;
+                this.isDragging = false;
+
+                let targetY = this.currentY;
+                if (!isWheel && Math.abs(this.velocity) > 0.1) {
+                    targetY += this.velocity * 150;
+                }
+
+                const index = Math.round(-targetY / this.itemHeight);
+                this.setIndex(index);
+            }
+
+            setIndex(idx) {
+                const minIdx = this.totalOptions;
+                const maxIdx = (this.loopCount - 1) * this.totalOptions - 1;
+
+                if (idx < minIdx) idx += this.totalOptions;
+                if (idx > maxIdx) idx -= this.totalOptions;
+
+                this.currentY = -idx * this.itemHeight;
+                this.wheel.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
+                this.update();
+
+                this.selectedValue = this.options[idx % this.totalOptions];
+            }
+
+            setSelectedValue(val) {
+                const num = parseInt(val, 10);
+                const optIdx = this.options.indexOf(num);
+                if (optIdx === -1) return;
+                const midSetStart = Math.floor(this.loopCount / 2) * this.totalOptions;
+                this.setIndex(midSetStart + optIdx);
+            }
+
+            update() {
+                this.wheel.style.transform = `translateY(${this.currentY + this.itemYOffset}px)`;
+                const centerIdx = Math.round(-this.currentY / this.itemHeight);
+                const items = this.wheel.querySelectorAll('.picker-item');
+
+                items.forEach((item, i) => {
+                    const dist = i - centerIdx;
+                    const isActive = dist === 0;
+                    item.classList.toggle('active', isActive);
+
+                    const rotate = dist * 25;
+                    const translateZ = Math.abs(dist) * -10;
+                    const opacity = Math.max(0.1, 1 - Math.abs(dist) * 0.35);
+                    item.style.transform = `rotateX(${rotate}deg) translateZ(${translateZ}px)`;
+                    item.style.opacity = opacity;
+                });
+            }
+        }
+
+        let modalParkingPicker, modalGatePicker;
+
+        /********************
+         * MODAL
+         ********************/
+        function openNew() {
+            document.getElementById('editId').value = '';
+
+            // Default: parking 7, puerta 1
+            modalParkingPicker.setSelectedValue(7);
+            modalGatePicker.setSelectedValue(1);
+
+            document.getElementById('editModal').style.display = 'flex';
+            modalParkingPicker.refreshHeight();
+            modalGatePicker.refreshHeight();
+        }
+
+        function openEditById(id) {
+            const item = entries.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+
+            modalParkingPicker.setSelectedValue(item.parking);
+            modalGatePicker.setSelectedValue(item.gate);
+
+            document.getElementById('editModal').style.display = 'flex';
+            modalParkingPicker.refreshHeight();
+            modalGatePicker.refreshHeight();
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editId').value = '';
+        }
+
+        function removeById(id) {
+            entries = entries.filter(x => x.id !== id);
+            saveData();
+            renderList();
+        }
+
+        /********************
+         * RENDER
+         ********************/
+        function renderList() {
+            const list = document.getElementById('resultsList');
+
+            if (!entries.length) {
+                list.innerHTML = '<div class="empty-state">Sin registros. Pulsa AÑADIR.</div>';
+                return;
+            }
+
+            // Orden por parking ascendente
+            const view = [...entries].sort((a, b) => a.parking - b.parking);
+
+            list.innerHTML = view.map((e) => {
+                const safeId = String(e.id).replace(/'/g, "\\'");
+                return `
+                    <div class="flight-card glass">
+                        <div class="card-body minimalist">
+                            <div class="info-item">
+                                <label>Parking</label>
+                                <span class="val-parking">${e.parking}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Puerta</label>
+                                <span class="val-gate">${e.gate}</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-action edit" onclick="openEditById('${safeId}')">EDITAR</button>
+                            <button class="btn-action delete" onclick="removeById('${safeId}')">BORRAR</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /********************
+         * INIT
+         ********************/
+        document.addEventListener('DOMContentLoaded', () => {
+            // (2) Parkings 7..24
+            const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
+            const gates = Array.from({ length: 12 }, (_, i) => i + 1);
+
+            modalParkingPicker = new InfinitePicker('modalParkingWheel', parkings);
+            modalGatePicker = new InfinitePicker('modalGateWheel', gates);
+
+            // (4) Persistencia: carga al iniciar
+            loadData();
+
+            document.getElementById('addBtn').addEventListener('click', openNew);
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+
+            document.getElementById('editForm').addEventListener('submit', (ev) => {
+                ev.preventDefault();
+
+                const parking = modalParkingPicker.selectedValue;
+                const gate = modalGatePicker.selectedValue;
+
+                const id = document.getElementById('editId').value;
+
+                if (id) {
+                    // Editando existente: actualiza y mantiene 1 registro por parking
+                    entries = entries.map(x => {
+                        if (x.id !== id) return x;
+                        return { ...x, parking, gate };
+                    });
+
+                    // Elimina duplicados por parking (excepto el que editamos)
+                    entries = entries.filter(x => x.id === id || x.parking !== parking);
+                } else {
+                    // Nuevo: 1 registro por parking
+                    entries = entries.filter(x => x.parking !== parking);
+                    entries.unshift({ id: newId(), parking, gate, createdAt: Date.now() });
+                }
+
+                saveData();
+                renderList();
+                closeModal();
+            });
         });
-
-        this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
-        const midSetIdx = Math.floor(this.loopCount / 2) * this.totalOptions;
-        this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
-        this.currentY = -midSetIdx * this.itemHeight;
-        this.update(false);
-
-        this.wheel.addEventListener('touchstart', e => this.onStart(e), { passive: false });
-        window.addEventListener('touchmove', e => this.onMove(e), { passive: false });
-        window.addEventListener('touchend', () => this.onEnd());
-
-        this.wheel.addEventListener('mousedown', e => this.onStart(e));
-        window.addEventListener('mousemove', e => this.onMove(e));
-        window.addEventListener('mouseup', () => this.onEnd());
-
-        this.wheel.parentElement.addEventListener('wheel', e => {
-          e.preventDefault();
-          this.currentY -= Math.sign(e.deltaY) * this.itemHeight;
-          this.onEnd(true);
-        });
-      }
-
-      onStart(e) {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        this.isDragging = true;
-        const y = e.touches ? e.touches[0].pageY : e.pageY;
-        this.startY = y - this.currentY;
-        this.lastY = y;
-        this.lastTime = Date.now();
-        this.wheel.style.transition = 'none';
-      }
-
-      onMove(e) {
-        if (!this.isDragging) return;
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        const y = e.touches ? e.touches[0].pageY : e.pageY;
-        const now = Date.now();
-        const dt = now - this.lastTime;
-        if (dt > 0) this.velocity = (y - this.lastY) / dt;
-
-        this.currentY = y - this.startY;
-        this.lastY = y;
-        this.lastTime = now;
-        this.update(false);
-      }
-
-      onEnd(isWheel = false) {
-        if (!this.isDragging && !isWheel) return;
-        this.isDragging = false;
-
-        let targetY = this.currentY;
-        if (!isWheel && Math.abs(this.velocity) > 0.1) {
-          targetY += this.velocity * 150;
-        }
-
-        const index = Math.round(-targetY / this.itemHeight);
-        this.setIndex(index);
-      }
-
-      setIndex(idx) {
-        const minIdx = this.totalOptions;
-        const maxIdx = (this.loopCount - 1) * this.totalOptions - 1;
-
-        if (idx < minIdx) idx += this.totalOptions;
-        if (idx > maxIdx) idx -= this.totalOptions;
-
-        this.currentY = -idx * this.itemHeight;
-        this.wheel.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
-        this.update(true);
-
-        this.selectedValue = this.options[idx % this.totalOptions];
-      }
-
-      update() {
-        this.wheel.style.transform = `translateY(${this.currentY + this.itemYOffset}px)`;
-        const centerIdx = Math.round(-this.currentY / this.itemHeight);
-        const items = this.wheel.querySelectorAll('.picker-item');
-
-        items.forEach((item, i) => {
-          const dist = i - centerIdx;
-          const isActive = dist === 0;
-          item.classList.toggle('active', isActive);
-
-          const rotate = dist * 25;
-          const translateZ = Math.abs(dist) * -10;
-          const opacity = Math.max(0.1, 1 - Math.abs(dist) * 0.35);
-          item.style.transform = `rotateX(${rotate}deg) translateZ(${translateZ}px)`;
-          item.style.opacity = opacity;
-        });
-      }
-    }
-
-    /********************
-     * NETWORK (robusto)
-     ********************/
-    async function fetchJsonThroughProxies(url, timeoutMs = 12000) {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), timeoutMs);
-
-      const tryOne = async (proxyBase) => {
-        const finalUrl = proxyBase + encodeURIComponent(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now());
-        const r = await fetch(finalUrl, {
-          cache: 'no-store',
-          referrerPolicy: 'no-referrer',
-          signal: controller.signal
-        });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-
-        // allorigins devuelve {contents:"..."}
-        const data = await r.json().catch(() => null);
-        const payload = (data && (data.contents || data)) ?? null;
-        if (!payload) throw new Error('Sin payload');
-
-        // payload puede ser string JSON o ya objeto/array
-        if (Array.isArray(payload)) return payload;
-        if (typeof payload === 'string') {
-          const trimmed = payload.trim();
-
-          // Si Aena devuelve HTML de mantenimiento, aquí se detecta
-          if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html') || trimmed.includes('mantenimiento')) {
-            throw new Error('Aena devolvió HTML (posible mantenimiento/bloqueo).');
-          }
-
-          const parsed = JSON.parse(trimmed);
-          if (Array.isArray(parsed)) return parsed;
-          throw new Error('JSON no es array');
-        }
-
-        // si es objeto y contiene array dentro
-        if (payload && Array.isArray(payload.data)) return payload.data;
-
-        throw new Error('Formato inesperado');
-      };
-
-      try {
-        let lastErr = null;
-        for (const p of PROXIES) {
-          try {
-            const res = await tryOne(p);
-            clearTimeout(t);
-            return res;
-          } catch (e) {
-            lastErr = e;
-          }
-        }
-        throw lastErr || new Error('No se pudo obtener datos.');
-      } finally {
-        clearTimeout(t);
-      }
-    }
-
-    /********************
-     * AENA PARSE
-     ********************/
-    function normalizeFlightNumber(s) {
-      return (s || '').toString().toUpperCase().replace(/\s+/g, '');
-    }
-
-    function pickFirst(obj, keys) {
-      for (const k of keys) {
-        if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
-      }
-      return '';
-    }
-
-    function normalizeAenaFlight(raw, tipoVuelo) {
-      const num = normalizeFlightNumber(raw.numVuelo || raw.flightNumber || '');
-      const city = (raw.ciudadIataOtro || raw.iataOtro || raw.idAeropuertoOtro || raw.origen || raw.destino || '').toString();
-      const company = raw.compania || raw.airline || '';
-
-      const gate = pickFirst(raw, ['puertaPrimera', 'puerta', 'gate', 'puertaSegunda']);
-      const belt = pickFirst(raw, ['cintaPrimera', 'cinta', 'belt', 'cintaSegunda']);
-
-      const prog = pickFirst(raw, ['horaProgramada', 'horaProg', 'horaPrevista', 'hora']);
-      const est = pickFirst(raw, ['horaEstimada', 'horaEst', 'horaReal', 'horaActualizada']);
-
-      const status = pickFirst(raw, ['situacion', 'estado', 'status']);
-      const terminal = pickFirst(raw, ['terminal', 'term', 'terminalOrigen', 'terminalDestino']);
-
-      return {
-        numVuelo: num,
-        tipoVuelo, // 'L' o 'S'
-        city: city,
-        compania: company,
-        gate: gate ? gate.toString() : '',
-        belt: belt ? belt.toString() : '',
-        horaProgramada: prog ? prog.toString() : '',
-        horaEstimada: est ? est.toString() : '',
-        situacion: status ? status.toString() : '',
-        terminal: terminal ? terminal.toString() : '',
-        _raw: raw
-      };
-    }
-
-    async function fetchAenaAll() {
-      const [arr, dep] = await Promise.all([
-        fetchJsonThroughProxies(AENA_ENDPOINTS.L).catch(() => null),
-        fetchJsonThroughProxies(AENA_ENDPOINTS.S).catch(() => null)
-      ]);
-
-      const flights = [];
-      if (Array.isArray(arr)) flights.push(...arr.map(x => normalizeAenaFlight(x, 'L')));
-      if (Array.isArray(dep)) flights.push(...dep.map(x => normalizeAenaFlight(x, 'S')));
-
-      if (flights.length === 0) {
-        throw new Error('No hay datos Aena (posible mantenimiento/bloqueo).');
-      }
-      return flights;
-    }
-
-    /********************
-     * OSM (Overpass) -> stands
-     ********************/
-    function buildOverpassQueryForParkingPositions() {
-      // Busca parking_position (stands) dentro de bbox ACE
-      return `
-        [out:json][timeout:25];
-        (
-          node["aeroway"="parking_position"](${ACE_BBOX.latMin},${ACE_BBOX.lonMin},${ACE_BBOX.latMax},${ACE_BBOX.lonMax});
-          way["aeroway"="parking_position"](${ACE_BBOX.latMin},${ACE_BBOX.lonMin},${ACE_BBOX.latMax},${ACE_BBOX.lonMax});
-          node["aeroway"="stand"](${ACE_BBOX.latMin},${ACE_BBOX.lonMin},${ACE_BBOX.latMax},${ACE_BBOX.lonMax});
-          way["aeroway"="stand"](${ACE_BBOX.latMin},${ACE_BBOX.lonMin},${ACE_BBOX.latMax},${ACE_BBOX.lonMax});
-        );
-        out center tags;
-      `.trim();
-    }
-
-    async function loadStandsFromOSM() {
-      const q = buildOverpassQueryForParkingPositions();
-      const url = OVERPASS_INTERPRETER + '?data=' + encodeURIComponent(q);
-
-      // Overpass suele permitir CORS, pero por si acaso usamos proxies (misma función)
-      const data = await fetchJsonThroughProxies(url, 15000).catch(() => null);
-
-      // Si por proxy no devuelve json directo (porque ya es json), intentamos fetch normal:
-      if (!data) {
-        const r = await fetch(url, { cache: 'no-store' });
-        if (!r.ok) throw new Error('Overpass HTTP ' + r.status);
-        const j = await r.json();
-        return mapStandsFromOverpass(j);
-      }
-
-      // data aquí sería un array si el proxy lo parsea como array (no aplica), así que:
-      // en práctica, por proxies puede no funcionar con Overpass. Por eso, hacemos fetch normal arriba.
-      return null;
-    }
-
-    function mapStandsFromOverpass(overpassJson) {
-      const map = {};
-      const els = (overpassJson && overpassJson.elements) ? overpassJson.elements : [];
-      for (const el of els) {
-        const tags = el.tags || {};
-        const ref = (tags.ref || tags.name || '').toString().trim();
-        const refNum = parseInt(ref.replace(/[^\d]/g, ''), 10);
-        if (!refNum || refNum < 1 || refNum > 99) continue;
-
-        let lat = el.lat, lon = el.lon;
-        if ((!lat || !lon) && el.center) { lat = el.center.lat; lon = el.center.lon; }
-        if (!lat || !lon) continue;
-
-        // nos quedamos con 1..24 por tu operativa
-        if (refNum >= 1 && refNum <= 24 && !map[refNum]) {
-          map[refNum] = { ref: refNum, lat, lon };
-        }
-      }
-      return map;
-    }
-
-    async function ensureStandMap() {
-      if (standMap) return standMap;
-
-      // Intento 1: fetch directo Overpass (mejor)
-      try {
-        const q = buildOverpassQueryForParkingPositions();
-        const url = OVERPASS_INTERPRETER + '?data=' + encodeURIComponent(q);
-        const r = await fetch(url, { cache: 'no-store' });
-        if (!r.ok) throw new Error('Overpass HTTP ' + r.status);
-        const j = await r.json();
-        standMap = mapStandsFromOverpass(j);
-      } catch (e) {
-        standMap = {};
-      }
-      return standMap;
-    }
-
-    /********************
-     * OPENSKY (ADS-B)
-     ********************/
-    async function fetchOpenSkyStates() {
-      const params = new URLSearchParams({
-        lamin: ACE_BBOX.latMin,
-        lomin: ACE_BBOX.lonMin,
-        lamax: ACE_BBOX.latMax,
-        lomax: ACE_BBOX.lonMax
-      });
-      const url = OPENSKY_STATES_ALL + '?' + params.toString();
-
-      // OpenSky suele bloquear CORS -> usamos proxies
-      const data = await fetchJsonThroughProxies(url, 12000);
-      // data puede ser objeto OpenSky (no array) -> si viene como string parseado, ya ok
-      // fetchJsonThroughProxies espera array; aquí puede fallar.
-      // Por eso hacemos fetch “raw” con proxy manual:
-      return await fetchOpenSkyRaw(url);
-    }
-
-    async function fetchOpenSkyRaw(url, timeoutMs = 12000) {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), timeoutMs);
-
-      const tryOne = async (proxyBase) => {
-        const finalUrl = proxyBase + encodeURIComponent(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now());
-        const r = await fetch(finalUrl, { cache: 'no-store', referrerPolicy: 'no-referrer', signal: controller.signal });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const data = await r.json().catch(() => null);
-        const payload = (data && (data.contents || data)) ?? null;
-        if (!payload) throw new Error('Sin payload');
-
-        if (typeof payload === 'string') {
-          const parsed = JSON.parse(payload);
-          return parsed;
-        }
-        return payload;
-      };
-
-      try {
-        let lastErr = null;
-        for (const p of PROXIES) {
-          try { return await tryOne(p); } catch (e) { lastErr = e; }
-        }
-        throw lastErr || new Error('No se pudo consultar OpenSky.');
-      } finally {
-        clearTimeout(t);
-      }
-    }
-
-    function haversineMeters(lat1, lon1, lat2, lon2) {
-      const R = 6371000;
-      const toRad = x => x * Math.PI / 180;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-      return 2 * R * Math.asin(Math.sqrt(a));
-    }
-
-    function parseCallsignToCandidateFlights(callsignRaw) {
-      const callsign = (callsignRaw || '').toString().toUpperCase().replace(/\s+/g, '');
-      if (!callsign) return [];
-
-      // Caso 1: ya parece IATA+numero (2 letras + dígitos)
-      if (/^[A-Z]{2}\d{1,5}$/.test(callsign)) return [callsign];
-
-      // Caso 2: ICAO+numero (3 letras + dígitos)
-      const m = callsign.match(/^([A-Z]{3})(\d{1,5})$/);
-      if (m) {
-        const icao = m[1];
-        const num = m[2];
-        const iata = ICAO_TO_IATA[icao];
-        if (iata) return [iata + num];
-        return [];
-      }
-
-      // Caso 3: algo como "RYR12AB" -> no convertible fiable
-      return [];
-    }
-
-    async function detectFlightAtParking(parkingNumber) {
-      const stands = await ensureStandMap();
-      const stand = stands[parkingNumber];
-      if (!stand) {
-        return { ok: false, reason: `OSM no tiene el stand ${parkingNumber} mapeado (ref) en la zona consultada.` };
-      }
-
-      let os;
-      try {
-        os = await fetchOpenSkyRaw(OPENSKY_STATES_ALL + '?' + new URLSearchParams({
-          lamin: ACE_BBOX.latMin, lomin: ACE_BBOX.lonMin, lamax: ACE_BBOX.latMax, lomax: ACE_BBOX.lonMax
-        }).toString());
-      } catch (e) {
-        return { ok: false, reason: 'No se pudo consultar OpenSky (ADS-B). ' + e.message };
-      }
-
-      const states = (os && os.states) ? os.states : [];
-      if (!states.length) return { ok: false, reason: 'OpenSky no devolvió estados en ACE (sin cobertura o límite de rate).' };
-
-      // OpenSky state vector: [icao24, callsign, origin_country, time_position, last_contact, longitude, latitude, baro_altitude, on_ground, ...]
-      let best = null;
-      for (const st of states) {
-        const callsign = st[1];
-        const lon = st[5], lat = st[6];
-        const onGround = st[8];
-        if (!onGround) continue;
-        if (typeof lat !== 'number' || typeof lon !== 'number') continue;
-
-        const d = haversineMeters(stand.lat, stand.lon, lat, lon);
-        if (!best || d < best.dist) {
-          best = { callsign, lat, lon, dist: d, icao24: st[0] };
-        }
-      }
-
-      if (!best) return { ok: false, reason: 'No hay aeronaves "on ground" en OpenSky para ACE ahora mismo.' };
-      if (best.dist > STAND_MATCH_METERS) {
-        return { ok: false, reason: `La aeronave más cercana está a ~${Math.round(best.dist)}m (umbral ${STAND_MATCH_METERS}m).` };
-      }
-
-      const candidates = parseCallsignToCandidateFlights(best.callsign);
-      if (!candidates.length) {
-        return {
-          ok: false,
-          reason: `Se detectó aeronave en el stand, pero el callsign "${(best.callsign || '').trim()}" no se pudo convertir a nº de vuelo IATA.`,
-          raw: best
-        };
-      }
-
-      return { ok: true, stand, raw: best, candidates };
-    }
-
-    /********************
-     * MAIN SEARCH
-     ********************/
-    async function handleSearch() {
-      showNotice('');
-      setLoading(true);
-
-      const parking = mainPicker.selectedValue;
-
-      try {
-        // 1) Detectar vuelo por stand (OSM+OpenSky)
-        const det = await detectFlightAtParking(parking);
-        if (!det.ok) {
-          showNotice('Aviso: ' + det.reason + ' | Recomendación: usa +MANUAL con Nº de vuelo.');
-          throw new Error(det.reason);
-        }
-
-        // 2) Traer Aena y cruzar
-        let aenaFlights;
-        try {
-          aenaFlights = await fetchAenaAll();
-        } catch (e) {
-          showNotice('Aena no disponible ahora (mantenimiento/bloqueo). Se mostrará solo el callsign detectado.');
-          // Guardamos parcial
-          const partial = {
-            id: det.candidates[0] || '',
-            parking: parking,
-            tipoVuelo: '',
-            originOrDest: '',
-            compania: '',
-            gate: '',
-            belt: '',
-            horaProgramada: '',
-            horaEstimada: '',
-            situacion: '',
-            terminal: '',
-            source: 'auto',
-            callsign: (det.raw && det.raw.callsign) ? det.raw.callsign.trim() : '',
-            updatedAt: Date.now()
-          };
-
-          activeFlights = activeFlights.filter(f => !(f.source === 'auto' && f.parking === parking));
-          activeFlights.unshift(partial);
-          renderList();
-          saveData();
-          return;
-        }
-
-        const index = new Map();
-        for (const f of aenaFlights) index.set(normalizeFlightNumber(f.numVuelo), f);
-
-        let found = null;
-        for (const cand of det.candidates) {
-          const k = normalizeFlightNumber(cand);
-          if (index.has(k)) { found = index.get(k); break; }
-        }
-
-        if (!found) {
-          showNotice(`Se detectó callsign en parking ${parking}, pero no se encontró el vuelo en Aena con candidatos: ${det.candidates.join(', ')}. Usa +MANUAL.`);
-          throw new Error('No match en Aena.');
-        }
-
-        // 3) Guardar y mostrar
-        const card = {
-          id: found.numVuelo,
-          parking: parking,
-          tipoVuelo: found.tipoVuelo,
-          originOrDest: found.city,
-          compania: found.compania,
-          gate: found.gate,
-          belt: found.belt,
-          horaProgramada: found.horaProgramada,
-          horaEstimada: found.horaEstimada,
-          situacion: found.situacion,
-          terminal: found.terminal,
-          source: 'auto',
-          callsign: (det.raw && det.raw.callsign) ? det.raw.callsign.trim() : '',
-          updatedAt: Date.now()
-        };
-
-        activeFlights = activeFlights.filter(f => !(f.source === 'auto' && f.parking === parking));
-        activeFlights.unshift(card);
-        renderList();
-        saveData();
-
-      } catch (e) {
-        // Si falla todo, no rompemos la app
-        console.warn('Search error:', e);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    /********************
-     * BACKGROUND SYNC
-     ********************/
-    async function runBackgroundSync() {
-      if (activeFlights.length === 0) return;
-
-      try {
-        const aenaFlights = await fetchAenaAll();
-        const index = new Map();
-        for (const f of aenaFlights) index.set(normalizeFlightNumber(f.numVuelo), f);
-
-        let updated = false;
-        for (const local of activeFlights) {
-          if (!local.id) continue;
-          const match = index.get(normalizeFlightNumber(local.id));
-          if (!match) continue;
-
-          const newGate = match.gate || '';
-          const newBelt = match.belt || '';
-          const newStatus = match.situacion || '';
-          const newEst = match.horaEstimada || '';
-          const newTerm = match.terminal || '';
-
-          if (local.gate !== newGate || local.belt !== newBelt || local.situacion !== newStatus || local.horaEstimada !== newEst || local.terminal !== newTerm) {
-            local.gate = newGate;
-            local.belt = newBelt;
-            local.situacion = newStatus;
-            local.horaEstimada = newEst;
-            local.terminal = newTerm;
-            local.updatedAt = Date.now();
-            updated = true;
-          }
-        }
-
-        if (updated) {
-          renderList();
-          saveData();
-        }
-      } catch (e) {
-        // Silencioso para no molestar
-      }
-    }
-
-    /********************
-     * RENDER
-     ********************/
-    function tipoLabel(t) {
-      if (t === 'L') return 'LLEGADA';
-      if (t === 'S') return 'SALIDA';
-      return '---';
-    }
-
-    function renderList() {
-      const list = document.getElementById('resultsList');
-      if (activeFlights.length === 0) {
-        list.innerHTML = '<div class="empty-state">Sin datos guardados.</div>';
-        return;
-      }
-
-      list.innerHTML = activeFlights.map((f, i) => {
-        const flight = f.id || '---';
-        const city = f.originOrDest || '---';
-        const comp = f.compania || '---';
-        const gate = f.gate || '--';
-        const belt = f.belt || '--';
-        const parking = f.parking || '--';
-        const tipo = tipoLabel(f.tipoVuelo);
-        const status = f.situacion || '---';
-        const term = f.terminal || '--';
-        const hp = f.horaProgramada || '--';
-        const he = f.horaEstimada || '--';
-        const callsign = f.callsign ? f.callsign : '';
-
-        return `
-          <div class="flight-card glass">
-            <div class="card-body detailed">
-              <div class="header-item">
-                <span class="val-flight">${flight}</span>
-                <span class="val-dest">${city}</span>
-              </div>
-
-              <div class="info-item full"><label>TIPO</label><span class="val-type">${tipo}</span></div>
-
-              <div class="info-item full"><label>COMPAÑÍA</label><span>${comp}</span></div>
-
-              <div class="info-item"><label>PARKING</label><span class="val-parking">${parking}</span></div>
-              <div class="info-item"><label>TERMINAL</label><span>${term}</span></div>
-
-              <div class="info-item"><label>PUERTA (EMBARQUE)</label><span class="val-gate">${gate}</span></div>
-              <div class="info-item"><label>CINTA (LLEGADAS)</label><span class="val-belt">${belt}</span></div>
-
-              <div class="info-item"><label>HORA PROG.</label><span>${hp}</span></div>
-              <div class="info-item"><label>HORA EST.</label><span>${he}</span></div>
-
-              <div class="info-item full"><label>ESTADO</label><span class="val-status">${status}</span></div>
-
-              ${callsign ? `<div class="info-item full"><label>CALLSIGN (ADS-B)</label><span>${callsign}</span></div>` : ''}
-              <div class="info-item full"><label>ORIGEN</label><span>${f.source === 'auto' ? 'AUTO (OSM+OpenSky + Aena)' : 'MANUAL'}</span></div>
-            </div>
-
-            <div class="card-actions">
-              <button class="btn-action edit" onclick="openEdit(${i})">EDITAR</button>
-              <button class="btn-action delete" onclick="removeFlight(${i})">BORRAR</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function removeFlight(i) {
-      activeFlights.splice(i, 1);
-      renderList();
-      saveData();
-    }
-
-    /********************
-     * EDIT (simple: reutiliza modal manual)
-     ********************/
-    function openEdit(i) {
-      const f = activeFlights[i];
-      document.getElementById('manualParking').value = f.parking || '';
-      document.getElementById('manualFlight').value = f.id || '';
-      document.getElementById('manualType').value = f.tipoVuelo || 'AUTO';
-      document.getElementById('manualModal').style.display = 'flex';
-
-      // guardamos índice en dataset
-      document.getElementById('manualModal').dataset.editIndex = String(i);
-    }
-
-    /********************
-     * MANUAL MODAL
-     ********************/
-    function openManual() {
-      document.getElementById('manualModal').dataset.editIndex = '';
-      document.getElementById('manualParking').value = mainPicker.selectedValue || '';
-      document.getElementById('manualFlight').value = '';
-      document.getElementById('manualType').value = 'AUTO';
-      document.getElementById('manualModal').style.display = 'flex';
-    }
-
-    function closeManual() {
-      document.getElementById('manualModal').style.display = 'none';
-      document.getElementById('manualModal').dataset.editIndex = '';
-    }
-
-    async function resolveManualWithAena(flightNum, tipoPreferido) {
-      let aenaFlights;
-      try {
-        aenaFlights = await fetchAenaAll();
-      } catch {
-        return null;
-      }
-
-      const norm = normalizeFlightNumber(flightNum);
-      const matches = aenaFlights.filter(x => normalizeFlightNumber(x.numVuelo) === norm);
-
-      if (!matches.length) return null;
-
-      if (tipoPreferido === 'L') return matches.find(x => x.tipoVuelo === 'L') || matches[0];
-      if (tipoPreferido === 'S') return matches.find(x => x.tipoVuelo === 'S') || matches[0];
-
-      // AUTO: si hay ambos, prioriza el que tenga más info (puerta/cinta)
-      matches.sort((a, b) => {
-        const score = (x) => (x.gate ? 1 : 0) + (x.belt ? 1 : 0) + (x.horaEstimada ? 1 : 0);
-        return score(b) - score(a);
-      });
-      return matches[0];
-    }
-
-    /********************
-     * INIT
-     ********************/
-    document.addEventListener('DOMContentLoaded', () => {
-      const mainParkings = Array.from({ length: 24 }, (_, i) => i + 1);
-      mainPicker = new InfinitePicker('parkingWheel', mainParkings);
-
-      loadData();
-
-      document.getElementById('searchBtn').addEventListener('click', handleSearch);
-
-      document.getElementById('manualForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        showNotice('');
-
-        const parking = parseInt(document.getElementById('manualParking').value, 10);
-        const flight = normalizeFlightNumber(document.getElementById('manualFlight').value);
-        const tipo = document.getElementById('manualType').value;
-
-        if (!parking || parking < 1 || parking > 24) { alert('Parking inválido'); return; }
-        if (!flight) { alert('Número de vuelo inválido'); return; }
-
-        setLoading(true);
-        try {
-          const resolved = await resolveManualWithAena(flight, tipo);
-          const idxStr = document.getElementById('manualModal').dataset.editIndex;
-          const editIndex = idxStr ? parseInt(idxStr, 10) : NaN;
-
-          const item = resolved ? {
-            id: resolved.numVuelo,
-            parking: parking,
-            tipoVuelo: resolved.tipoVuelo,
-            originOrDest: resolved.city,
-            compania: resolved.compania,
-            gate: resolved.gate,
-            belt: resolved.belt,
-            horaProgramada: resolved.horaProgramada,
-            horaEstimada: resolved.horaEstimada,
-            situacion: resolved.situacion,
-            terminal: resolved.terminal,
-            source: 'manual',
-            callsign: '',
-            updatedAt: Date.now()
-          } : {
-            id: flight,
-            parking: parking,
-            tipoVuelo: (tipo === 'AUTO' ? '' : tipo),
-            originOrDest: '',
-            compania: '',
-            gate: '',
-            belt: '',
-            horaProgramada: '',
-            horaEstimada: '',
-            situacion: '',
-            terminal: '',
-            source: 'manual',
-            callsign: '',
-            updatedAt: Date.now()
-          };
-
-          if (!isNaN(editIndex)) {
-            activeFlights[editIndex] = { ...activeFlights[editIndex], ...item };
-          } else {
-            activeFlights.unshift(item);
-          }
-
-          renderList();
-          saveData();
-          closeManual();
-
-          if (!resolved) {
-            showNotice('Guardado manual. Aena no devolvió datos del vuelo (puede ser muy futuro o Aena bloqueado).');
-          }
-        } finally {
-          setLoading(false);
-        }
-      });
-
-      // Sync cada 2 minutos (igual que tú)
-      setInterval(runBackgroundSync, 120000);
-    });
-  </script>
+    </script>
 </body>
 
 </html>
