@@ -49,6 +49,21 @@
             flex-direction: column;
         }
 
+        /* === BLOQUEO DE FONDO CUANDO EL MODAL ESTÁ ABIERTO === */
+        html.scroll-lock,
+        body.scroll-lock {
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        body.scroll-lock {
+            position: fixed;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+
         .bg-glow {
             position: fixed;
             top: 0;
@@ -126,7 +141,6 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
 
-        /* BOTONES PRINCIPALES (solo añadir y limpiar) */
         .actions-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -183,7 +197,6 @@
             font-size: 1.25rem;
         }
 
-        /* Results Grid */
         .results-list {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -219,7 +232,6 @@
 
         .info-item {
             text-align: center;
-            border: none;
             width: auto;
         }
 
@@ -299,6 +311,10 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
+
+            /* ayuda a evitar "scroll chaining" dentro del overlay */
+            overscroll-behavior: none;
+            touch-action: none;
         }
 
         .modal-content {
@@ -306,6 +322,9 @@
             max-width: 360px;
             padding: 1.75rem;
             position: relative;
+
+            overscroll-behavior: none;
+            touch-action: none;
         }
 
         .modal-close {
@@ -416,7 +435,6 @@
     </header>
 
     <main class="container">
-        <!-- SOLO BOTONES: AÑADIR / LIMPIAR -->
         <div class="actions-row">
             <button id="addBtn" class="btn-primary glass">
                 <span class="btn-icon">➕</span>
@@ -434,7 +452,6 @@
         </div>
     </main>
 
-    <!-- MODAL (ruletas iPhone) -->
     <div id="editModal" class="modal">
         <div class="modal-content glass">
             <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -470,11 +487,8 @@
     </div>
 
     <script>
-        /********************
-         * DATA (persistente)
-         ********************/
         const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V2';
-        let entries = []; // { id:string, parking:number, gate:number, createdAt:number }
+        let entries = [];
 
         function newId() {
             if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -497,10 +511,38 @@
         }
 
         function clearAll() {
-            // (3) sin confirmación
             entries = [];
             localStorage.removeItem(STORAGE_KEY);
             renderList();
+        }
+
+        /********************
+         * BLOQUEO DE SCROLL DEL FONDO (modal)
+         ********************/
+        let _scrollY = 0;
+        function lockBackground() {
+            // Guarda posición actual
+            _scrollY = window.scrollY || window.pageYOffset || 0;
+
+            // Bloquea html y body
+            document.documentElement.classList.add('scroll-lock');
+            document.body.classList.add('scroll-lock');
+
+            // Mantiene la vista en el mismo sitio (body fijo)
+            document.body.style.top = `-${_scrollY}px`;
+        }
+
+        function unlockBackground() {
+            // Quita lock
+            document.documentElement.classList.remove('scroll-lock');
+            document.body.classList.remove('scroll-lock');
+
+            // Restaura
+            const top = document.body.style.top;
+            document.body.style.top = '';
+
+            // Vuelve a la posición previa
+            window.scrollTo(0, _scrollY);
         }
 
         /********************
@@ -556,7 +598,7 @@
                     e.preventDefault();
                     this.currentY -= Math.sign(e.deltaY) * this.itemHeight;
                     this.onEnd(true);
-                });
+                }, { passive: false });
             }
 
             refreshHeight() {
@@ -647,17 +689,17 @@
 
         let modalParkingPicker, modalGatePicker;
 
-        /********************
-         * MODAL
-         ********************/
         function openNew() {
             document.getElementById('editId').value = '';
 
-            // Default: parking 7, puerta 1
             modalParkingPicker.setSelectedValue(7);
             modalGatePicker.setSelectedValue(1);
 
             document.getElementById('editModal').style.display = 'flex';
+
+            // === BLOQUEAR FONDO ===
+            lockBackground();
+
             modalParkingPicker.refreshHeight();
             modalGatePicker.refreshHeight();
         }
@@ -667,11 +709,14 @@
             if (!item) return;
 
             document.getElementById('editId').value = item.id;
-
             modalParkingPicker.setSelectedValue(item.parking);
             modalGatePicker.setSelectedValue(item.gate);
 
             document.getElementById('editModal').style.display = 'flex';
+
+            // === BLOQUEAR FONDO ===
+            lockBackground();
+
             modalParkingPicker.refreshHeight();
             modalGatePicker.refreshHeight();
         }
@@ -679,6 +724,9 @@
         function closeModal() {
             document.getElementById('editModal').style.display = 'none';
             document.getElementById('editId').value = '';
+
+            // === DESBLOQUEAR FONDO ===
+            unlockBackground();
         }
 
         function removeById(id) {
@@ -687,9 +735,6 @@
             renderList();
         }
 
-        /********************
-         * RENDER
-         ********************/
         function renderList() {
             const list = document.getElementById('resultsList');
 
@@ -698,7 +743,6 @@
                 return;
             }
 
-            // Orden por parking ascendente
             const view = [...entries].sort((a, b) => a.parking - b.parking);
 
             list.innerHTML = view.map((e) => {
@@ -724,18 +768,13 @@
             }).join('');
         }
 
-        /********************
-         * INIT
-         ********************/
         document.addEventListener('DOMContentLoaded', () => {
-            // (2) Parkings 7..24
-            const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
+            const parkings = Array.from({ length: 18 }, (_, i) => i + 7); // 7..24
             const gates = Array.from({ length: 12 }, (_, i) => i + 1);
 
             modalParkingPicker = new InfinitePicker('modalParkingWheel', parkings);
             modalGatePicker = new InfinitePicker('modalGateWheel', gates);
 
-            // (4) Persistencia: carga al iniciar
             loadData();
 
             document.getElementById('addBtn').addEventListener('click', openNew);
@@ -750,16 +789,9 @@
                 const id = document.getElementById('editId').value;
 
                 if (id) {
-                    // Editando existente: actualiza y mantiene 1 registro por parking
-                    entries = entries.map(x => {
-                        if (x.id !== id) return x;
-                        return { ...x, parking, gate };
-                    });
-
-                    // Elimina duplicados por parking (excepto el que editamos)
+                    entries = entries.map(x => (x.id === id ? { ...x, parking, gate } : x));
                     entries = entries.filter(x => x.id === id || x.parking !== parking);
                 } else {
-                    // Nuevo: 1 registro por parking
                     entries = entries.filter(x => x.parking !== parking);
                     entries.unshift({ id: newId(), parking, gate, createdAt: Date.now() });
                 }
