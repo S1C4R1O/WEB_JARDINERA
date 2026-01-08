@@ -2,17 +2,20 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>JARDINERA ACE - Parking Monitor</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:wght@700;800&display=swap"
-    rel="stylesheet">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="JARDINERA">
+    rel="stylesheet" />
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JARDINERA" />
+
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
   <link rel="apple-touch-icon"
@@ -29,7 +32,6 @@
       --accent: #38bdf8;
       --danger: #ef4444;
       --glass-border: rgba(255, 255, 255, 0.08);
-      --item-height: 40px;
     }
 
     * {
@@ -50,7 +52,7 @@
       flex-direction: column;
     }
 
-    /* Bloqueo del fondo mientras el modal está abierto */
+    /* Bloqueo del fondo mientras modal abierto */
     html.scroll-lock,
     body.scroll-lock {
       height: 100%;
@@ -67,10 +69,7 @@
 
     .bg-glow {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       z-index: -1;
       overflow: hidden;
     }
@@ -126,7 +125,7 @@
     .subtitle {
       color: var(--text-muted);
       font-size: 0.65rem;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       opacity: 0.82;
@@ -141,6 +140,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.42);
     }
 
+    /* Botones */
     .actions-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -163,6 +163,8 @@
       gap: 0.25rem;
       line-height: 1.1;
       user-select: none;
+      position: relative;
+      overflow: hidden;
     }
 
     .btn-primary {
@@ -184,10 +186,34 @@
       filter: brightness(1.08);
     }
 
+    /* Animación visible al pulsar AÑADIR */
+    .btn-primary.is-pop {
+      animation: btnPop 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes btnPop {
+      0% {
+        transform: scale(1);
+      }
+
+      35% {
+        transform: scale(0.96);
+      }
+
+      70% {
+        transform: scale(1.03);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
     .btn-icon {
       font-size: 1.25rem;
     }
 
+    /* Grid tarjetas */
     .results-list {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -195,122 +221,150 @@
       padding-bottom: 3rem;
     }
 
-    .flight-card {
-      padding: 0.75rem;
-      position: relative;
-      border-radius: 1rem;
-      overflow: hidden;
-      animation: slideUp 0.45s cubic-bezier(0.23, 1, 0.32, 1);
-      will-change: transform, opacity;
+    /* En pantallas pequeñas, 1 columna para evitar recortes */
+    @media (max-width: 380px) {
+      .results-list {
+        grid-template-columns: 1fr;
+      }
     }
 
-    @keyframes slideUp {
+    .flight-card {
+      padding: 0.85rem 0.75rem 0.75rem;
+      border-radius: 1rem;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      opacity: 1;
+      will-change: transform, opacity;
+      animation: cardEnter 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes cardEnter {
       from {
         opacity: 0;
-        transform: translateY(16px);
+        transform: translateY(18px) scale(0.985);
       }
 
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
-    /* Animación “nueva tarjeta”: brillo + pequeña expansión */
+    /* Animación NUEVA tarjeta (muy visible) */
     .flight-card.is-new {
-      animation: slideUp 0.45s cubic-bezier(0.23, 1, 0.32, 1), popGlow 0.95s ease-out;
-      border-color: rgba(245, 158, 11, 0.35);
+      animation: cardEnter 0.45s cubic-bezier(0.23, 1, 0.32, 1), newGlow 1.25s ease-out;
+      border-color: rgba(245, 158, 11, 0.45);
     }
 
-    @keyframes popGlow {
+    @keyframes newGlow {
       0% {
-        transform: translateY(10px) scale(0.985);
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0.0);
+        box-shadow: 0 0 0 rgba(245, 158, 11, 0);
       }
 
-      55% {
-        transform: translateY(0) scale(1.015);
-        box-shadow: 0 18px 55px rgba(245, 158, 11, 0.12);
+      45% {
+        box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.16);
       }
 
       100% {
-        transform: translateY(0) scale(1);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.42);
+        box-shadow: 0 0 0 rgba(245, 158, 11, 0);
       }
     }
 
-    /* “Shimmer” creativo */
+    /* “Shimmer” fuerte */
     .flight-card.is-new::before {
       content: "";
       position: absolute;
-      inset: -40% -60%;
+      inset: -50% -70%;
       background: linear-gradient(120deg,
           transparent 35%,
-          rgba(245, 158, 11, 0.16) 45%,
-          rgba(56, 189, 248, 0.10) 52%,
+          rgba(245, 158, 11, 0.22) 46%,
+          rgba(56, 189, 248, 0.14) 52%,
           transparent 62%);
-      transform: translateX(-40%) rotate(10deg);
-      animation: shimmer 0.9s ease-out;
+      transform: translateX(-60%) rotate(10deg);
+      animation: shimmer 1.0s ease-out;
       pointer-events: none;
     }
 
     @keyframes shimmer {
       from {
-        transform: translateX(-55%) rotate(10deg);
+        transform: translateX(-70%) rotate(10deg);
         opacity: 0;
       }
 
-      20% {
+      15% {
         opacity: 1;
       }
 
       to {
-        transform: translateX(55%) rotate(10deg);
+        transform: translateX(70%) rotate(10deg);
         opacity: 0;
       }
     }
 
-    /* Animación “editado”: pulso suave */
+    /* Animación EDITADO (muy visible) */
     .flight-card.is-updated {
-      animation: slideUp 0.25s ease, updatePulse 0.65s ease-out;
+      animation: updatePulse 0.95s ease-out;
+      border-color: rgba(56, 189, 248, 0.35);
     }
 
     @keyframes updatePulse {
       0% {
+        transform: scale(1);
         box-shadow: 0 0 0 rgba(56, 189, 248, 0);
       }
 
-      55% {
-        box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.12);
+      40% {
+        transform: scale(1.015);
+        box-shadow: 0 0 0 7px rgba(56, 189, 248, 0.16);
       }
 
       100% {
+        transform: scale(1);
         box-shadow: 0 0 0 rgba(56, 189, 248, 0);
       }
     }
 
-    .card-body.minimalist {
+    /* Animación BORRAR */
+    .flight-card.is-removing {
+      animation: cardRemove 0.28s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes cardRemove {
+      to {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+      }
+    }
+
+    /* Contenido tarjeta: CORREGIDO para NO cortar nada */
+    .card-body {
       display: flex;
+      gap: 0.6rem;
       align-items: center;
-      justify-content: space-around;
-      padding: 1.25rem 0.35rem 1.15rem;
-      gap: 0.35rem;
+      justify-content: space-between;
+      padding: 0.6rem 0.1rem 0.9rem;
     }
 
     .info-item {
+      flex: 1 1 0;
+      min-width: 0; /* CLAVE: evita recortes */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      width: auto;
-      min-width: 110px;
+      gap: 0.2rem;
     }
 
-    /* ICONO ENCIMA DEL NOMBRE */
+    /* Icono encima del nombre */
     .label-with-icon {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 0.18rem;
-      margin-bottom: 0.15rem;
       user-select: none;
     }
 
@@ -318,24 +372,31 @@
       font-size: 1.05rem;
       opacity: 0.95;
       filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.25));
+      line-height: 1;
     }
 
     .label-text {
-      font-size: 0.62rem;
+      font-size: 0.60rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-muted);
-      opacity: 0.78;
-      font-weight: 800;
+      opacity: 0.82;
+      font-weight: 900;
+      white-space: nowrap;
     }
 
     .value-big {
       font-weight: 950;
       line-height: 1.05;
       display: block;
-      font-size: 2.25rem;
       letter-spacing: -0.02em;
       user-select: none;
+
+      /* CLAVE: tamaño adaptativo para que NO corte */
+      font-size: clamp(1.65rem, 6.3vw, 2.35rem);
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .val-gate {
@@ -348,48 +409,50 @@
 
     .card-actions {
       display: flex;
-      gap: 0.3rem;
+      gap: 0.35rem;
       border-top: 1px solid var(--glass-border);
-      padding-top: 0.5rem;
-      margin-top: 0.3rem;
+      padding-top: 0.55rem;
+      margin-top: 0.25rem;
     }
 
     .btn-action {
       flex: 1;
-      padding: 0.35rem;
-      border-radius: 0.45rem;
+      padding: 0.45rem 0.35rem;
+      border-radius: 0.55rem;
       border: 1px solid var(--glass-border);
-      font-weight: 800;
-      font-size: 0.55rem;
+      font-weight: 900;
+      font-size: 0.58rem;
       cursor: pointer;
       transition: transform 0.15s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
       background: transparent;
       color: var(--text-muted);
+      user-select: none;
     }
 
     .btn-action:active {
-      transform: scale(0.98);
+      transform: scale(0.985);
     }
 
     .btn-action.edit:active {
       border-color: var(--accent);
       color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
+      background: rgba(56, 189, 248, 0.10);
     }
 
     .btn-action.delete:active {
       border-color: var(--danger);
       color: var(--danger);
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.10);
     }
 
     .empty-state {
       text-align: center;
       padding: 2rem 1rem;
-      opacity: 0.25;
-      font-weight: 800;
+      opacity: 0.28;
+      font-weight: 900;
       font-size: 0.85rem;
       color: var(--text-muted);
+      grid-column: 1 / -1;
     }
 
     /* Modal */
@@ -397,13 +460,19 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.86);
       backdrop-filter: blur(15px);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 1rem;
       overscroll-behavior: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal.show {
+      opacity: 1;
     }
 
     .modal-content {
@@ -411,15 +480,14 @@
       max-width: 360px;
       padding: 1.75rem;
       position: relative;
-      overscroll-behavior: none;
       transform-origin: center;
-      animation: modalIn 0.28s cubic-bezier(0.23, 1, 0.32, 1);
+      animation: modalIn 0.32s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
     @keyframes modalIn {
       from {
         opacity: 0;
-        transform: translateY(10px) scale(0.985);
+        transform: translateY(14px) scale(0.975);
       }
 
       to {
@@ -453,7 +521,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
-      margin-bottom: 1.35rem;
+      margin-bottom: 1.25rem;
       height: 120px;
     }
 
@@ -504,7 +572,7 @@
       align-items: center;
       justify-content: center;
       font-size: 1.25rem;
-      font-weight: 850;
+      font-weight: 900;
       color: var(--text-muted);
       transition: color 0.2s, font-size 0.2s;
       width: 100%;
@@ -517,12 +585,12 @@
       font-size: 1.5rem;
     }
 
-    /* Botón guardar: animaciones */
+    /* Guardar: animaciones visibles */
     .btn-save {
       width: 100%;
-      height: 52px;
+      height: 54px;
       border: none;
-      border-radius: 0.85rem;
+      border-radius: 0.90rem;
       background: var(--primary);
       color: var(--bg-dark);
       font-weight: 950;
@@ -531,7 +599,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
       user-select: none;
       transition: transform 0.15s ease, filter 0.2s ease;
       position: relative;
@@ -540,13 +608,12 @@
 
     .btn-save:active {
       transform: scale(0.98);
-      filter: brightness(1.05);
+      filter: brightness(1.06);
     }
 
     .btn-save:disabled {
-      opacity: 0.92;
+      opacity: 0.93;
       cursor: not-allowed;
-      filter: saturate(0.9);
     }
 
     .save-spinner {
@@ -572,15 +639,15 @@
     .btn-save.is-saved::before {
       content: "";
       position: absolute;
-      inset: -50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%);
-      animation: savedFlash 0.55s ease-out;
+      inset: -55%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.20) 0%, transparent 60%);
+      animation: savedFlash 0.62s ease-out;
       pointer-events: none;
     }
 
     @keyframes savedFlash {
       from {
-        transform: scale(0.6);
+        transform: scale(0.55);
         opacity: 0;
       }
 
@@ -589,7 +656,7 @@
       }
 
       to {
-        transform: scale(1.2);
+        transform: scale(1.25);
         opacity: 0;
       }
     }
@@ -628,15 +695,14 @@
   <div id="editModal" class="modal" aria-hidden="true">
     <div class="modal-content glass" id="modalContent" role="dialog" aria-modal="true">
       <button class="modal-close" type="button" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 1.25rem; font-family: Montserrat; font-size: 1rem; text-align: center;">
+      <h2 style="margin-bottom: 1.1rem; font-family: Montserrat; font-size: 1rem; text-align: center;">
         PUERTA / PARKING
       </h2>
 
       <form id="editForm">
         <div class="modal-pickers-row">
-          <!-- Primero PUERTA -->
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">
+            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Puerta
             </label>
             <div class="modal-picker-item" id="modalGateContainer">
@@ -645,9 +711,8 @@
             </div>
           </div>
 
-          <!-- Luego PARKING -->
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">
+            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Parking
             </label>
             <div class="modal-picker-item" id="modalParkContainer">
@@ -669,9 +734,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V5';
+    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V6';
 
-    let entries = []; // orden de creación (NO se ordena)
+    let entries = [];                 // NO ordenar: orden de creación (nuevo arriba)
     let lastCreatedId = null;
     let lastUpdatedId = null;
 
@@ -695,13 +760,7 @@
       renderList();
     }
 
-    function clearAll() {
-      entries = [];
-      localStorage.removeItem(STORAGE_KEY);
-      renderList();
-    }
-
-    /* Bloqueo del fondo */
+    /* ===== Fondo bloqueado ===== */
     let _scrollY = 0;
     function lockBackground() {
       _scrollY = window.scrollY || window.pageYOffset || 0;
@@ -717,7 +776,7 @@
       window.scrollTo(0, _scrollY);
     }
 
-    /* Picker infinito */
+    /* ===== Picker ===== */
     class InfinitePicker {
       constructor(wheelId, options, displayFn = null) {
         this.wheel = document.getElementById(wheelId);
@@ -865,6 +924,7 @@
       return (g === 0) ? '⏳' : '🚪';
     }
 
+    /* ===== Guardar: estados visibles ===== */
     function resetSaveButton() {
       const btn = document.getElementById('saveBtn');
       btn.disabled = false;
@@ -887,19 +947,25 @@
       btn.classList.add('is-saved');
       document.getElementById('saveIcon').textContent = '✅';
       document.getElementById('saveText').textContent = 'GUARDADO';
-      // micro “haptic” si existe (Android/Chrome)
       if (navigator.vibrate) navigator.vibrate(18);
     }
 
+    /* ===== Modal: abrir/cerrar ===== */
     function openNew() {
+      const addBtn = document.getElementById('addBtn');
+      addBtn.classList.remove('is-pop');
+      void addBtn.offsetWidth;
+      addBtn.classList.add('is-pop');
+
       document.getElementById('editId').value = '';
       resetSaveButton();
 
-      modalGatePicker.setSelectedValue(0);   // por defecto sin puerta
+      modalGatePicker.setSelectedValue(0);
       modalParkingPicker.setSelectedValue(7);
 
       const modal = document.getElementById('editModal');
       modal.style.display = 'flex';
+      requestAnimationFrame(() => modal.classList.add('show'));
       modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
@@ -919,6 +985,7 @@
 
       const modal = document.getElementById('editModal');
       modal.style.display = 'flex';
+      requestAnimationFrame(() => modal.classList.add('show'));
       modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
@@ -928,18 +995,17 @@
 
     function closeModal() {
       const modal = document.getElementById('editModal');
-      modal.style.display = 'none';
+      modal.classList.remove('show');
       modal.setAttribute('aria-hidden', 'true');
-      document.getElementById('editId').value = '';
-      unlockBackground();
+
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.getElementById('editId').value = '';
+        unlockBackground();
+      }, 220);
     }
 
-    function removeById(id) {
-      entries = entries.filter(x => x.id !== id);
-      saveData();
-      renderList();
-    }
-
+    /* ===== Render ===== */
     function renderList() {
       const list = document.getElementById('resultsList');
 
@@ -948,17 +1014,15 @@
         return;
       }
 
-      // IMPORTANTE: NO SE ORDENA. Orden = creación (tal como está en entries)
-      const view = entries;
-
-      list.innerHTML = view.map((e) => {
-        const safeId = String(e.id).replace(/"/g, '&quot;').replace(/'/g, "\\'");
+      // NO ordenar: se respeta el orden actual de entries
+      list.innerHTML = entries.map((e) => {
+        const id = String(e.id).replace(/'/g, "\\'");
         const clsNew = (lastCreatedId && e.id === lastCreatedId) ? ' is-new' : '';
         const clsUpd = (lastUpdatedId && e.id === lastUpdatedId) ? ' is-updated' : '';
 
         return `
           <div class="flight-card glass${clsNew}${clsUpd}" data-id="${String(e.id)}">
-            <div class="card-body minimalist">
+            <div class="card-body">
               <div class="info-item">
                 <div class="label-with-icon">
                   <div class="label-ico">${gateIcon(e.gate)}</div>
@@ -977,38 +1041,60 @@
             </div>
 
             <div class="card-actions">
-              <button class="btn-action edit" type="button" onclick="openEditById('${safeId}')">EDITAR</button>
-              <button class="btn-action delete" type="button" onclick="removeById('${safeId}')">BORRAR</button>
+              <button class="btn-action edit" type="button" onclick="openEditById('${id}')">EDITAR</button>
+              <button class="btn-action delete" type="button" onclick="removeById('${id}')">BORRAR</button>
             </div>
           </div>
         `;
       }).join('');
 
-      // Limpia clases de animación después de un rato (sin reordenar nada)
-      if (lastCreatedId) {
-        const id = lastCreatedId;
-        setTimeout(() => {
-          const el = document.querySelector(`.flight-card[data-id="${CSS.escape(String(id))}"]`);
-          if (el) el.classList.remove('is-new');
-        }, 1100);
-        lastCreatedId = null;
-      }
-
-      if (lastUpdatedId) {
-        const id = lastUpdatedId;
-        setTimeout(() => {
-          const el = document.querySelector(`.flight-card[data-id="${CSS.escape(String(id))}"]`);
-          if (el) el.classList.remove('is-updated');
-        }, 850);
-        lastUpdatedId = null;
-      }
+      // Limpieza de estados (solo para no repetir el efecto)
+      lastCreatedId = null;
+      lastUpdatedId = null;
     }
 
+    /* ===== Animaciones BORRAR / LIMPIAR con espera antes de render ===== */
+    function removeById(id) {
+      const el = document.querySelector(`.flight-card[data-id="${id}"]`);
+      if (el) {
+        el.classList.add('is-removing');
+        if (navigator.vibrate) navigator.vibrate(12);
+      }
+
+      setTimeout(() => {
+        entries = entries.filter(x => x.id !== id);
+        saveData();
+        renderList();
+      }, 290);
+    }
+
+    function clearAll() {
+      const cards = Array.from(document.querySelectorAll('.flight-card'));
+      if (!cards.length) {
+        entries = [];
+        localStorage.removeItem(STORAGE_KEY);
+        renderList();
+        return;
+      }
+
+      // Cascada
+      cards.forEach((c, i) => {
+        setTimeout(() => c.classList.add('is-removing'), i * 45);
+      });
+
+      if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+
+      setTimeout(() => {
+        entries = [];
+        localStorage.removeItem(STORAGE_KEY);
+        renderList();
+      }, 45 * cards.length + 320);
+    }
+
+    /* ===== INIT ===== */
     document.addEventListener('DOMContentLoaded', () => {
-      // Parkings 7..24
-      const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
-      // Puertas: 0 = "—" + 1..12
-      const gates = [0, ...Array.from({ length: 12 }, (_, i) => i + 1)];
+      const parkings = Array.from({ length: 18 }, (_, i) => i + 7);  // 7..24
+      const gates = [0, ...Array.from({ length: 12 }, (_, i) => i + 1)]; // 0=—
 
       modalGatePicker = new InfinitePicker('modalGateWheel', gates, (v) => (v === 0 ? '—' : String(v)));
       modalParkingPicker = new InfinitePicker('modalParkingWheel', parkings, (v) => String(v));
@@ -1018,7 +1104,7 @@
       document.getElementById('addBtn').addEventListener('click', openNew);
       document.getElementById('clearBtn').addEventListener('click', clearAll);
 
-      // Modal “tocar fuera no hace nada” + evitar scroll accidental sin romper clicks
+      // Modal: tocar fuera no hace nada, y no hay scroll accidental
       const modal = document.getElementById('editModal');
       const modalContent = document.getElementById('modalContent');
 
@@ -1030,34 +1116,29 @@
         e.preventDefault();
       }, { passive: false });
 
-      modal.addEventListener('click', () => {
-        // no hace nada
-      });
-
+      modal.addEventListener('click', () => { /* nada */ });
       modalContent.addEventListener('click', (e) => e.stopPropagation());
 
-      // Guardar con animación/feedback
+      // Guardar (crear/editar) con animaciones
       document.getElementById('editForm').addEventListener('submit', async (ev) => {
         ev.preventDefault();
-
-        // Estado "guardando" (no bloquea los eventos del botón)
         setSavingState();
 
-        // Pequeña pausa para que se vea la transición (y se sienta “premium”)
+        // Pausa corta para que se vea el estado “GUARDANDO”
         await new Promise(r => setTimeout(r, 220));
 
-        const gate = modalGatePicker.selectedValue;        // 0..12
-        const parking = modalParkingPicker.selectedValue;  // 7..24
+        const gate = modalGatePicker.selectedValue;
+        const parking = modalParkingPicker.selectedValue;
         const id = document.getElementById('editId').value;
 
         if (id) {
-          // Editar existente
+          // Editar sin cambiar orden
           entries = entries.map(x => (x.id === id ? { ...x, gate, parking } : x));
           // 1 por parking (excepto el editado)
           entries = entries.filter(x => x.id === id || x.parking !== parking);
           lastUpdatedId = id;
         } else {
-          // Nuevo: 1 por parking
+          // Crear (nuevo arriba)
           const nid = newId();
           entries = entries.filter(x => x.parking !== parking);
           entries.unshift({ id: nid, gate, parking, createdAt: Date.now() });
@@ -1066,11 +1147,8 @@
 
         saveData();
         renderList();
-
-        // Estado “guardado”
         setSavedState();
 
-        // Cierra con un timing agradable
         await new Promise(r => setTimeout(r, 520));
         closeModal();
       });
