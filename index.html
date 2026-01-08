@@ -50,7 +50,7 @@
       flex-direction: column;
     }
 
-    /* Bloqueo total de fondo mientras modal abierto */
+    /* Bloqueo total del fondo mientras el modal está abierto */
     html.scroll-lock,
     body.scroll-lock {
       height: 100%;
@@ -213,22 +213,15 @@
     }
 
     @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card-body.minimalist {
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 1.5rem 0.5rem;
+      padding: 1.35rem 0.5rem;
     }
 
     .info-item {
@@ -241,23 +234,29 @@
       font-size: 0.65rem;
       text-transform: uppercase;
       color: var(--text-muted);
-      opacity: 0.7;
+      opacity: 0.75;
+      margin-bottom: 0.15rem;
     }
 
-    .info-item span {
+    .value-with-icon {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.35rem;
       font-weight: 900;
       line-height: 1.1;
-      display: block;
-      font-size: 2.2rem;
+      font-size: 2.15rem;
+      white-space: nowrap;
     }
 
-    .val-gate {
-      color: var(--accent);
+    .value-with-icon .ico {
+      font-size: 1.3rem;
+      opacity: 0.95;
+      transform: translateY(-1px);
     }
 
-    .val-parking {
-      color: var(--primary);
-    }
+    .val-gate { color: var(--accent); }
+    .val-parking { color: var(--primary); }
 
     .card-actions {
       display: flex;
@@ -313,9 +312,7 @@
       justify-content: center;
       padding: 1rem;
 
-      /* Bloqueo de gestos/scroll en el overlay */
       overscroll-behavior: none;
-      touch-action: none;
     }
 
     .modal-content {
@@ -323,10 +320,7 @@
       max-width: 360px;
       padding: 1.75rem;
       position: relative;
-
-      /* Permite que los pickers funcionen (ellos gestionan touch) */
       overscroll-behavior: none;
-      touch-action: none;
     }
 
     .modal-close {
@@ -439,12 +433,12 @@
 
   <main class="container">
     <div class="actions-row">
-      <button id="addBtn" class="btn-primary glass">
+      <button id="addBtn" class="btn-primary glass" type="button">
         <span class="btn-icon">➕</span>
         <span>AÑADIR</span>
       </button>
 
-      <button id="clearBtn" class="btn-secondary glass">
+      <button id="clearBtn" class="btn-secondary glass" type="button">
         <span class="btn-icon">🧹</span>
         <span>LIMPIAR</span>
       </button>
@@ -455,19 +449,19 @@
     </div>
   </main>
 
-  <div id="editModal" class="modal">
-    <div class="modal-content glass" id="modalContent">
-      <button class="modal-close" onclick="closeModal()">&times;</button>
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-content glass" id="modalContent" role="dialog" aria-modal="true">
+      <button class="modal-close" type="button" onclick="closeModal()">&times;</button>
       <h2 style="margin-bottom: 1.25rem; font-family: Montserrat; font-size: 1rem; text-align: center;">
         PUERTA / PARKING
       </h2>
 
       <form id="editForm">
         <div class="modal-pickers-row">
-          <!-- (Invertido) Primero PUERTA -->
+          <!-- Primero PUERTA -->
           <div style="display:flex; flex-direction:column; gap:0.3rem">
             <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">
-              Puerta
+              🚪 Puerta
             </label>
             <div class="modal-picker-item" id="modalGateContainer">
               <div class="picker-selection-overlay"></div>
@@ -478,7 +472,7 @@
           <!-- Luego PARKING -->
           <div style="display:flex; flex-direction:column; gap:0.3rem">
             <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center;">
-              Parking
+              🅿️ Parking
             </label>
             <div class="modal-picker-item" id="modalParkContainer">
               <div class="picker-selection-overlay"></div>
@@ -488,14 +482,13 @@
         </div>
 
         <input type="hidden" id="editId" value="">
-
         <button type="submit" class="btn-save">GUARDAR</button>
       </form>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V3';
+    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V4';
     let entries = [];
 
     function newId() {
@@ -524,9 +517,7 @@
       renderList();
     }
 
-    /********************
-     * Bloqueo total fondo (modal)
-     ********************/
+    /* Bloqueo del fondo */
     let _scrollY = 0;
     function lockBackground() {
       _scrollY = window.scrollY || window.pageYOffset || 0;
@@ -542,16 +533,12 @@
       window.scrollTo(0, _scrollY);
     }
 
-    /********************
-     * Picker (ruleta iPhone) con soporte para "—"
-     * - Usamos 0 como "sin puerta" y se muestra como "—"
-     ********************/
+    /* Picker infinito */
     class InfinitePicker {
       constructor(wheelId, options, displayFn = null) {
         this.wheel = document.getElementById(wheelId);
         this.options = options;
         this.displayFn = displayFn || ((v) => String(v));
-
         this.itemHeight = 40;
         this.pickerHeight = 0;
         this.currentY = 0;
@@ -609,8 +596,6 @@
 
       onStart(e) {
         if (e.cancelable) e.preventDefault();
-        // No paramos propagación para que el overlay pueda prevenir scroll,
-        // pero los pickers seguirán recibiendo el evento.
         this.isDragging = true;
         const y = e.touches ? e.touches[0].pageY : e.pageY;
         this.startY = y - this.currentY;
@@ -688,14 +673,18 @@
 
     let modalParkingPicker, modalGatePicker;
 
+    function gateLabel(g) {
+      return (g === 0) ? '—' : String(g);
+    }
+
     function openNew() {
       document.getElementById('editId').value = '';
-
-      // Por defecto: puerta "—" (0) y parking 7
-      modalGatePicker.setSelectedValue(0);
+      modalGatePicker.setSelectedValue(0);   // por defecto sin puerta
       modalParkingPicker.setSelectedValue(7);
 
-      document.getElementById('editModal').style.display = 'flex';
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
       modalGatePicker.refreshHeight();
@@ -707,11 +696,12 @@
       if (!item) return;
 
       document.getElementById('editId').value = item.id;
-
       modalGatePicker.setSelectedValue(item.gate);
       modalParkingPicker.setSelectedValue(item.parking);
 
-      document.getElementById('editModal').style.display = 'flex';
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
       modalGatePicker.refreshHeight();
@@ -719,7 +709,9 @@
     }
 
     function closeModal() {
-      document.getElementById('editModal').style.display = 'none';
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
       document.getElementById('editId').value = '';
       unlockBackground();
     }
@@ -730,10 +722,6 @@
       renderList();
     }
 
-    function gateLabel(g) {
-      return (g === 0 || g === "0") ? '—' : String(g);
-    }
-
     function renderList() {
       const list = document.getElementById('resultsList');
 
@@ -742,7 +730,6 @@
         return;
       }
 
-      // Orden por parking ascendente
       const view = [...entries].sort((a, b) => a.parking - b.parking);
 
       list.innerHTML = view.map((e) => {
@@ -750,21 +737,18 @@
         return `
           <div class="flight-card glass">
             <div class="card-body minimalist">
-              <!-- (Invertido) Primero PUERTA -->
               <div class="info-item">
                 <label>Puerta</label>
-                <span class="val-gate">${gateLabel(e.gate)}</span>
+                <span class="value-with-icon val-gate"><span class="ico">🚪</span>${gateLabel(e.gate)}</span>
               </div>
-
-              <!-- Luego PARKING -->
               <div class="info-item">
                 <label>Parking</label>
-                <span class="val-parking">${e.parking}</span>
+                <span class="value-with-icon val-parking"><span class="ico">🅿️</span>${e.parking}</span>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn-action edit" onclick="openEditById('${safeId}')">EDITAR</button>
-              <button class="btn-action delete" onclick="removeById('${safeId}')">BORRAR</button>
+              <button class="btn-action edit" type="button" onclick="openEditById('${safeId}')">EDITAR</button>
+              <button class="btn-action delete" type="button" onclick="removeById('${safeId}')">BORRAR</button>
             </div>
           </div>
         `;
@@ -774,7 +758,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Parkings 7..24
       const parkings = Array.from({ length: 18 }, (_, i) => i + 7);
-
       // Puertas: 0 = "—" + 1..12
       const gates = [0, ...Array.from({ length: 12 }, (_, i) => i + 1)];
 
@@ -786,19 +769,41 @@
       document.getElementById('addBtn').addEventListener('click', openNew);
       document.getElementById('clearBtn').addEventListener('click', clearAll);
 
+      // Bloqueo total “tocar fuera no hace nada” SIN romper botones:
+      // - No usamos preventDefault en touchstart (para no matar clicks)
+      // - Solo prevenimos scroll/rueda
+      const modal = document.getElementById('editModal');
+      const modalContent = document.getElementById('modalContent');
+
+      modal.addEventListener('touchmove', (e) => {
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+
+      modal.addEventListener('wheel', (e) => {
+        e.preventDefault();
+      }, { passive: false });
+
+      // Tocar fuera no cierra y no interactúa con fondo (modal ya cubre todo)
+      modal.addEventListener('click', (e) => {
+        // no hacer nada
+      });
+
+      // Evita que el click dentro burbujee innecesariamente
+      modalContent.addEventListener('click', (e) => e.stopPropagation());
+
+      // Guardar
       document.getElementById('editForm').addEventListener('submit', (ev) => {
         ev.preventDefault();
 
-        const gate = modalGatePicker.selectedValue;      // 0..12 (0 = "—")
+        const gate = modalGatePicker.selectedValue;       // 0..12
         const parking = modalParkingPicker.selectedValue; // 7..24
 
         const id = document.getElementById('editId').value;
 
         if (id) {
-          // Edita
+          // Editar registro existente
           entries = entries.map(x => (x.id === id ? { ...x, gate, parking } : x));
-
-          // Mantén 1 registro por parking (excepto el editado)
+          // Mantener 1 por parking (excepto el editado)
           entries = entries.filter(x => x.id === id || x.parking !== parking);
         } else {
           // Nuevo: 1 por parking
@@ -809,31 +814,6 @@
         saveData();
         renderList();
         closeModal();
-      });
-
-      /* === BLOQUEO TOTAL "tocar fuera no hace nada" ===
-         Capturamos eventos del overlay para que NO se deslicen cosas detrás ni rebote.
-         No cerramos modal por tocar fuera (solo X o GUARDAR). */
-      const modal = document.getElementById('editModal');
-      const modalContent = document.getElementById('modalContent');
-
-      // Evita que los toques en el overlay hagan scroll/acciones raras
-      ['touchstart', 'touchmove', 'wheel'].forEach(evt => {
-        modal.addEventListener(evt, (e) => {
-          // Prevenir scroll/bounce del overlay
-          if (e.cancelable) e.preventDefault();
-        }, { passive: false });
-      });
-
-      // Si se hace click fuera, no hace nada (y no cierra)
-      modal.addEventListener('click', (e) => {
-        // Nada, solo impedir que "algo" burbujee
-        e.stopPropagation();
-      });
-
-      // Dentro del cuadro, dejamos que funcione normal (no bloqueamos clicks del contenido)
-      modalContent.addEventListener('click', (e) => {
-        e.stopPropagation();
       });
     });
   </script>
