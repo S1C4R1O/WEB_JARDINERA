@@ -109,9 +109,15 @@
       width: 100%;
     }
 
-    /* ✅ Ajuste: baja el título en iPhone (Dynamic Island / notch) */
+    /*
+      ✅ FIX REAL para iPhone con isla dinámica + status bar translucida:
+      - env(safe-area-inset-top) a veces no basta
+      - sumamos un offset fijo grande
+      - añadimos constant() para iOS antiguo
+    */
     header {
-      padding-top: calc(2.4rem + env(safe-area-inset-top));
+      padding-top: calc(5.6rem + constant(safe-area-inset-top));
+      padding-top: calc(5.6rem + env(safe-area-inset-top));
       padding-bottom: 0.75rem;
       text-align: center;
     }
@@ -685,13 +691,8 @@
 
     let modalParkingPicker, modalGatePicker;
 
-    function gateLabel(g) {
-      return (g === 0) ? '—' : String(g);
-    }
-
-    function gateIcon(g) {
-      return (g === 0) ? '⏳' : '🚪';
-    }
+    function gateLabel(g) { return (g === 0) ? '—' : String(g); }
+    function gateIcon(g) { return (g === 0) ? '⏳' : '🚪'; }
 
     function openNew() {
       document.getElementById('editId').value = '';
@@ -740,7 +741,6 @@
 
     function renderList() {
       const list = document.getElementById('resultsList');
-
       if (!entries.length) {
         list.innerHTML = '<div class="empty-state">Sin registros. Pulsa AÑADIR.</div>';
         return;
@@ -793,14 +793,8 @@
       const modal = document.getElementById('editModal');
       const modalContent = document.getElementById('modalContent');
 
-      modal.addEventListener('touchmove', (e) => {
-        if (e.cancelable) e.preventDefault();
-      }, { passive: false });
-
-      modal.addEventListener('wheel', (e) => {
-        e.preventDefault();
-      }, { passive: false });
-
+      modal.addEventListener('touchmove', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+      modal.addEventListener('wheel', (e) => { e.preventDefault(); }, { passive: false });
       modal.addEventListener('click', () => { /* nada */ });
       modalContent.addEventListener('click', (e) => e.stopPropagation());
 
@@ -813,12 +807,9 @@
         const id = document.getElementById('editId').value;
 
         if (id) {
-          // Editar sin cambiar orden
           entries = entries.map(x => (x.id === id ? { ...x, gate, parking } : x));
-          // 1 por parking (excepto el editado)
           entries = entries.filter(x => x.id === id || x.parking !== parking);
         } else {
-          // Crear (nuevo arriba)
           const nid = newId();
           entries = entries.filter(x => x.parking !== parking);
           entries.unshift({ id: nid, gate, parking, createdAt: Date.now() });
