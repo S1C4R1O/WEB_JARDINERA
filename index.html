@@ -42,10 +42,7 @@
     }
 
     /* Sin animaciones ni transiciones */
-    * {
-      animation: none !important;
-      transition: none !important;
-    }
+    * { animation: none !important; transition: none !important; }
 
     body {
       font-family: 'Inter', sans-serif;
@@ -56,6 +53,9 @@
       overflow-x: hidden;
       display: flex;
       flex-direction: column;
+
+      /* ✅ MARGEN FIJO ARRIBA (web + móvil) */
+      padding-top: 88px;
     }
 
     /* Bloqueo del fondo mientras modal abierto */
@@ -109,16 +109,8 @@
       width: 100%;
     }
 
-    /*
-      ✅ FIX REAL para iPhone con isla dinámica + status bar translucida:
-      - env(safe-area-inset-top) a veces no basta
-      - sumamos un offset fijo grande
-      - añadimos constant() para iOS antiguo
-    */
     header {
-      padding-top: calc(5.6rem + constant(safe-area-inset-top));
-      padding-top: calc(5.6rem + env(safe-area-inset-top));
-      padding-bottom: 0.75rem;
+      padding: 1.2rem 0 0.75rem;
       text-align: center;
     }
 
@@ -191,9 +183,7 @@
       font-size: 0.85rem;
     }
 
-    .btn-icon {
-      font-size: 1.25rem;
-    }
+    .btn-icon { font-size: 1.25rem; }
 
     /* Grid tarjetas */
     .results-list {
@@ -204,9 +194,7 @@
     }
 
     @media (max-width: 380px) {
-      .results-list {
-        grid-template-columns: 1fr;
-      }
+      .results-list { grid-template-columns: 1fr; }
     }
 
     .flight-card {
@@ -216,7 +204,6 @@
       overflow: hidden;
     }
 
-    /* Contenido tarjeta: centrado y sin cortes */
     .card-body {
       display: flex;
       gap: 0.6rem;
@@ -273,13 +260,8 @@
       text-overflow: ellipsis;
     }
 
-    .val-gate {
-      color: var(--accent);
-    }
-
-    .val-parking {
-      color: var(--primary);
-    }
+    .val-gate { color: var(--accent); }
+    .val-parking { color: var(--primary); }
 
     .card-actions {
       display: flex;
@@ -473,8 +455,7 @@
       <form id="editForm">
         <div class="modal-pickers-row">
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label
-              style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
+            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Puerta
             </label>
             <div class="modal-picker-item" id="modalGateContainer">
@@ -484,8 +465,7 @@
           </div>
 
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label
-              style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
+            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Parking
             </label>
             <div class="modal-picker-item" id="modalParkContainer">
@@ -741,6 +721,7 @@
 
     function renderList() {
       const list = document.getElementById('resultsList');
+
       if (!entries.length) {
         list.innerHTML = '<div class="empty-state">Sin registros. Pulsa AÑADIR.</div>';
         return;
@@ -789,7 +770,6 @@
       document.getElementById('addBtn').addEventListener('click', openNew);
       document.getElementById('clearBtn').addEventListener('click', clearAll);
 
-      // Modal: sin cerrar tocando fuera + sin scroll del fondo
       const modal = document.getElementById('editModal');
       const modalContent = document.getElementById('modalContent');
 
@@ -798,7 +778,6 @@
       modal.addEventListener('click', () => { /* nada */ });
       modalContent.addEventListener('click', (e) => e.stopPropagation());
 
-      // Guardar (crear/editar)
       document.getElementById('editForm').addEventListener('submit', (ev) => {
         ev.preventDefault();
 
