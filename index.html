@@ -41,6 +41,12 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* Sin animaciones ni transiciones */
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-dark);
@@ -155,7 +161,6 @@
       border-radius: 1rem;
       font-weight: 900;
       cursor: pointer;
-      transition: transform 0.15s ease, filter 0.15s ease, border-color 0.2s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -163,8 +168,6 @@
       gap: 0.25rem;
       line-height: 1.1;
       user-select: none;
-      position: relative;
-      overflow: hidden;
     }
 
     .btn-primary {
@@ -180,35 +183,6 @@
       font-size: 0.85rem;
     }
 
-    .btn-primary:active,
-    .btn-secondary:active {
-      transform: scale(0.97);
-      filter: brightness(1.08);
-    }
-
-    /* Animación visible al pulsar AÑADIR */
-    .btn-primary.is-pop {
-      animation: btnPop 0.55s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    @keyframes btnPop {
-      0% {
-        transform: scale(1);
-      }
-
-      35% {
-        transform: scale(0.96);
-      }
-
-      70% {
-        transform: scale(1.03);
-      }
-
-      100% {
-        transform: scale(1);
-      }
-    }
-
     .btn-icon {
       font-size: 1.25rem;
     }
@@ -221,7 +195,6 @@
       padding-bottom: 3rem;
     }
 
-    /* En pantallas pequeñas, 1 columna para evitar recortes */
     @media (max-width: 380px) {
       .results-list {
         grid-template-columns: 1fr;
@@ -233,112 +206,9 @@
       border-radius: 1rem;
       position: relative;
       overflow: hidden;
-      transform: translateY(0);
-      opacity: 1;
-      will-change: transform, opacity;
-      animation: cardEnter 0.45s cubic-bezier(0.23, 1, 0.32, 1);
     }
 
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(18px) scale(0.985);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    /* Animación NUEVA tarjeta (muy visible) */
-    .flight-card.is-new {
-      animation: cardEnter 0.45s cubic-bezier(0.23, 1, 0.32, 1), newGlow 1.25s ease-out;
-      border-color: rgba(245, 158, 11, 0.45);
-    }
-
-    @keyframes newGlow {
-      0% {
-        box-shadow: 0 0 0 rgba(245, 158, 11, 0);
-      }
-
-      45% {
-        box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.16);
-      }
-
-      100% {
-        box-shadow: 0 0 0 rgba(245, 158, 11, 0);
-      }
-    }
-
-    /* “Shimmer” fuerte */
-    .flight-card.is-new::before {
-      content: "";
-      position: absolute;
-      inset: -50% -70%;
-      background: linear-gradient(120deg,
-          transparent 35%,
-          rgba(245, 158, 11, 0.22) 46%,
-          rgba(56, 189, 248, 0.14) 52%,
-          transparent 62%);
-      transform: translateX(-60%) rotate(10deg);
-      animation: shimmer 1.0s ease-out;
-      pointer-events: none;
-    }
-
-    @keyframes shimmer {
-      from {
-        transform: translateX(-70%) rotate(10deg);
-        opacity: 0;
-      }
-
-      15% {
-        opacity: 1;
-      }
-
-      to {
-        transform: translateX(70%) rotate(10deg);
-        opacity: 0;
-      }
-    }
-
-    /* Animación EDITADO (muy visible) */
-    .flight-card.is-updated {
-      animation: updatePulse 0.95s ease-out;
-      border-color: rgba(56, 189, 248, 0.35);
-    }
-
-    @keyframes updatePulse {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
-      }
-
-      40% {
-        transform: scale(1.015);
-        box-shadow: 0 0 0 7px rgba(56, 189, 248, 0.16);
-      }
-
-      100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
-      }
-    }
-
-    /* Animación BORRAR */
-    .flight-card.is-removing {
-      animation: cardRemove 0.28s ease forwards;
-      pointer-events: none;
-    }
-
-    @keyframes cardRemove {
-      to {
-        opacity: 0;
-        transform: translateY(10px) scale(0.96);
-      }
-    }
-
-    /* Contenido tarjeta: CORREGIDO para NO cortar nada */
+    /* Contenido tarjeta: centrado y sin cortes */
     .card-body {
       display: flex;
       gap: 0.6rem;
@@ -349,7 +219,7 @@
 
     .info-item {
       flex: 1 1 0;
-      min-width: 0; /* CLAVE: evita recortes */
+      min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -358,7 +228,6 @@
       gap: 0.2rem;
     }
 
-    /* Icono encima del nombre */
     .label-with-icon {
       display: flex;
       flex-direction: column;
@@ -371,7 +240,6 @@
     .label-ico {
       font-size: 1.05rem;
       opacity: 0.95;
-      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.25));
       line-height: 1;
     }
 
@@ -391,8 +259,6 @@
       display: block;
       letter-spacing: -0.02em;
       user-select: none;
-
-      /* CLAVE: tamaño adaptativo para que NO corte */
       font-size: clamp(1.65rem, 6.3vw, 2.35rem);
       max-width: 100%;
       overflow: hidden;
@@ -423,26 +289,9 @@
       font-weight: 900;
       font-size: 0.58rem;
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
       background: transparent;
       color: var(--text-muted);
       user-select: none;
-    }
-
-    .btn-action:active {
-      transform: scale(0.985);
-    }
-
-    .btn-action.edit:active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.10);
-    }
-
-    .btn-action.delete:active {
-      border-color: var(--danger);
-      color: var(--danger);
-      background: rgba(239, 68, 68, 0.10);
     }
 
     .empty-state {
@@ -467,12 +316,6 @@
       justify-content: center;
       padding: 1rem;
       overscroll-behavior: none;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .modal.show {
-      opacity: 1;
     }
 
     .modal-content {
@@ -480,20 +323,6 @@
       max-width: 360px;
       padding: 1.75rem;
       position: relative;
-      transform-origin: center;
-      animation: modalIn 0.32s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    @keyframes modalIn {
-      from {
-        opacity: 0;
-        transform: translateY(14px) scale(0.975);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
     }
 
     .modal-close {
@@ -509,12 +338,6 @@
       font-size: 1rem;
       cursor: pointer;
       z-index: 10;
-      transition: transform 0.15s ease, background 0.2s ease;
-    }
-
-    .modal-close:active {
-      transform: scale(0.95);
-      background: rgba(255, 255, 255, 0.08);
     }
 
     .modal-pickers-row {
@@ -574,7 +397,6 @@
       font-size: 1.25rem;
       font-weight: 900;
       color: var(--text-muted);
-      transition: color 0.2s, font-size 0.2s;
       width: 100%;
       text-align: center;
       line-height: 1.2;
@@ -585,7 +407,6 @@
       font-size: 1.5rem;
     }
 
-    /* Guardar: animaciones visibles */
     .btn-save {
       width: 100%;
       height: 54px;
@@ -601,64 +422,6 @@
       justify-content: center;
       gap: 0.55rem;
       user-select: none;
-      transition: transform 0.15s ease, filter 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-save:active {
-      transform: scale(0.98);
-      filter: brightness(1.06);
-    }
-
-    .btn-save:disabled {
-      opacity: 0.93;
-      cursor: not-allowed;
-    }
-
-    .save-spinner {
-      width: 18px;
-      height: 18px;
-      border: 3px solid rgba(0, 0, 0, 0.18);
-      border-top: 3px solid rgba(0, 0, 0, 0.62);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .btn-save.is-saving .save-spinner {
-      display: inline-block;
-    }
-
-    .btn-save.is-saved::before {
-      content: "";
-      position: absolute;
-      inset: -55%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.20) 0%, transparent 60%);
-      animation: savedFlash 0.62s ease-out;
-      pointer-events: none;
-    }
-
-    @keyframes savedFlash {
-      from {
-        transform: scale(0.55);
-        opacity: 0;
-      }
-
-      35% {
-        opacity: 1;
-      }
-
-      to {
-        transform: scale(1.25);
-        opacity: 0;
-      }
     }
   </style>
 </head>
@@ -725,20 +488,16 @@
         <input type="hidden" id="editId" value="">
 
         <button type="submit" class="btn-save" id="saveBtn">
-          <span id="saveIcon">💾</span>
-          <span id="saveText">GUARDAR</span>
-          <span class="save-spinner" id="saveSpinner" aria-hidden="true"></span>
+          <span>💾</span>
+          <span>GUARDAR</span>
         </button>
       </form>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_V6';
-
-    let entries = [];                 // NO ordenar: orden de creación (nuevo arriba)
-    let lastCreatedId = null;
-    let lastUpdatedId = null;
+    const STORAGE_KEY = 'JARDINERA_ACE_MANUAL_FAST';
+    let entries = []; // orden creación (nuevo arriba)
 
     function newId() {
       if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -760,7 +519,13 @@
       renderList();
     }
 
-    /* ===== Fondo bloqueado ===== */
+    function clearAll() {
+      entries = [];
+      localStorage.removeItem(STORAGE_KEY);
+      renderList();
+    }
+
+    /* Bloqueo fondo */
     let _scrollY = 0;
     function lockBackground() {
       _scrollY = window.scrollY || window.pageYOffset || 0;
@@ -776,7 +541,7 @@
       window.scrollTo(0, _scrollY);
     }
 
-    /* ===== Picker ===== */
+    /* Picker */
     class InfinitePicker {
       constructor(wheelId, options, displayFn = null) {
         this.wheel = document.getElementById(wheelId);
@@ -814,7 +579,7 @@
         this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
         this.currentY = -midSetIdx * this.itemHeight;
 
-        this.update();
+        this.update(false);
 
         this.wheel.addEventListener('touchstart', e => this.onStart(e), { passive: false });
         window.addEventListener('touchmove', e => this.onMove(e), { passive: false });
@@ -834,7 +599,7 @@
       refreshHeight() {
         this.pickerHeight = this.wheel.parentElement.clientHeight || 120;
         this.itemYOffset = (this.pickerHeight / 2) - (this.itemHeight / 2) - 2;
-        this.update();
+        this.update(false);
       }
 
       onStart(e) {
@@ -858,7 +623,7 @@
         this.currentY = y - this.startY;
         this.lastY = y;
         this.lastTime = now;
-        this.update();
+        this.update(false);
       }
 
       onEnd(isWheel = false) {
@@ -882,8 +647,8 @@
         if (idx > maxIdx) idx -= this.totalOptions;
 
         this.currentY = -idx * this.itemHeight;
-        this.wheel.style.transition = 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)';
-        this.update();
+        this.wheel.style.transition = 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)';
+        this.update(true);
 
         this.selectedValue = this.options[idx % this.totalOptions];
       }
@@ -895,7 +660,7 @@
         this.setIndex(midSetStart + optIdx);
       }
 
-      update() {
+      update(animated) {
         this.wheel.style.transform = `translateY(${this.currentY + this.itemYOffset}px)`;
         const centerIdx = Math.round(-this.currentY / this.itemHeight);
         const items = this.wheel.querySelectorAll('.picker-item');
@@ -924,48 +689,13 @@
       return (g === 0) ? '⏳' : '🚪';
     }
 
-    /* ===== Guardar: estados visibles ===== */
-    function resetSaveButton() {
-      const btn = document.getElementById('saveBtn');
-      btn.disabled = false;
-      btn.classList.remove('is-saving', 'is-saved');
-      document.getElementById('saveIcon').textContent = '💾';
-      document.getElementById('saveText').textContent = 'GUARDAR';
-    }
-
-    function setSavingState() {
-      const btn = document.getElementById('saveBtn');
-      btn.disabled = true;
-      btn.classList.add('is-saving');
-      document.getElementById('saveIcon').textContent = '⏺️';
-      document.getElementById('saveText').textContent = 'GUARDANDO';
-    }
-
-    function setSavedState() {
-      const btn = document.getElementById('saveBtn');
-      btn.classList.remove('is-saving');
-      btn.classList.add('is-saved');
-      document.getElementById('saveIcon').textContent = '✅';
-      document.getElementById('saveText').textContent = 'GUARDADO';
-      if (navigator.vibrate) navigator.vibrate(18);
-    }
-
-    /* ===== Modal: abrir/cerrar ===== */
     function openNew() {
-      const addBtn = document.getElementById('addBtn');
-      addBtn.classList.remove('is-pop');
-      void addBtn.offsetWidth;
-      addBtn.classList.add('is-pop');
-
       document.getElementById('editId').value = '';
-      resetSaveButton();
-
       modalGatePicker.setSelectedValue(0);
       modalParkingPicker.setSelectedValue(7);
 
       const modal = document.getElementById('editModal');
       modal.style.display = 'flex';
-      requestAnimationFrame(() => modal.classList.add('show'));
       modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
@@ -978,14 +708,11 @@
       if (!item) return;
 
       document.getElementById('editId').value = item.id;
-      resetSaveButton();
-
       modalGatePicker.setSelectedValue(item.gate);
       modalParkingPicker.setSelectedValue(item.parking);
 
       const modal = document.getElementById('editModal');
       modal.style.display = 'flex';
-      requestAnimationFrame(() => modal.classList.add('show'));
       modal.setAttribute('aria-hidden', 'false');
       lockBackground();
 
@@ -995,17 +722,18 @@
 
     function closeModal() {
       const modal = document.getElementById('editModal');
-      modal.classList.remove('show');
+      modal.style.display = 'none';
       modal.setAttribute('aria-hidden', 'true');
-
-      setTimeout(() => {
-        modal.style.display = 'none';
-        document.getElementById('editId').value = '';
-        unlockBackground();
-      }, 220);
+      document.getElementById('editId').value = '';
+      unlockBackground();
     }
 
-    /* ===== Render ===== */
+    function removeById(id) {
+      entries = entries.filter(x => x.id !== id);
+      saveData();
+      renderList();
+    }
+
     function renderList() {
       const list = document.getElementById('resultsList');
 
@@ -1014,14 +742,10 @@
         return;
       }
 
-      // NO ordenar: se respeta el orden actual de entries
       list.innerHTML = entries.map((e) => {
         const id = String(e.id).replace(/'/g, "\\'");
-        const clsNew = (lastCreatedId && e.id === lastCreatedId) ? ' is-new' : '';
-        const clsUpd = (lastUpdatedId && e.id === lastUpdatedId) ? ' is-updated' : '';
-
         return `
-          <div class="flight-card glass${clsNew}${clsUpd}" data-id="${String(e.id)}">
+          <div class="flight-card glass" data-id="${String(e.id)}">
             <div class="card-body">
               <div class="info-item">
                 <div class="label-with-icon">
@@ -1047,53 +771,10 @@
           </div>
         `;
       }).join('');
-
-      // Limpieza de estados (solo para no repetir el efecto)
-      lastCreatedId = null;
-      lastUpdatedId = null;
     }
 
-    /* ===== Animaciones BORRAR / LIMPIAR con espera antes de render ===== */
-    function removeById(id) {
-      const el = document.querySelector(`.flight-card[data-id="${id}"]`);
-      if (el) {
-        el.classList.add('is-removing');
-        if (navigator.vibrate) navigator.vibrate(12);
-      }
-
-      setTimeout(() => {
-        entries = entries.filter(x => x.id !== id);
-        saveData();
-        renderList();
-      }, 290);
-    }
-
-    function clearAll() {
-      const cards = Array.from(document.querySelectorAll('.flight-card'));
-      if (!cards.length) {
-        entries = [];
-        localStorage.removeItem(STORAGE_KEY);
-        renderList();
-        return;
-      }
-
-      // Cascada
-      cards.forEach((c, i) => {
-        setTimeout(() => c.classList.add('is-removing'), i * 45);
-      });
-
-      if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
-
-      setTimeout(() => {
-        entries = [];
-        localStorage.removeItem(STORAGE_KEY);
-        renderList();
-      }, 45 * cards.length + 320);
-    }
-
-    /* ===== INIT ===== */
     document.addEventListener('DOMContentLoaded', () => {
-      const parkings = Array.from({ length: 18 }, (_, i) => i + 7);  // 7..24
+      const parkings = Array.from({ length: 18 }, (_, i) => i + 7); // 7..24
       const gates = [0, ...Array.from({ length: 12 }, (_, i) => i + 1)]; // 0=—
 
       modalGatePicker = new InfinitePicker('modalGateWheel', gates, (v) => (v === 0 ? '—' : String(v)));
@@ -1104,7 +785,7 @@
       document.getElementById('addBtn').addEventListener('click', openNew);
       document.getElementById('clearBtn').addEventListener('click', clearAll);
 
-      // Modal: tocar fuera no hace nada, y no hay scroll accidental
+      // Modal: sin cerrar tocando fuera + sin scroll del fondo
       const modal = document.getElementById('editModal');
       const modalContent = document.getElementById('modalContent');
 
@@ -1119,16 +800,12 @@
       modal.addEventListener('click', () => { /* nada */ });
       modalContent.addEventListener('click', (e) => e.stopPropagation());
 
-      // Guardar (crear/editar) con animaciones
-      document.getElementById('editForm').addEventListener('submit', async (ev) => {
+      // Guardar (crear/editar)
+      document.getElementById('editForm').addEventListener('submit', (ev) => {
         ev.preventDefault();
-        setSavingState();
 
-        // Pausa corta para que se vea el estado “GUARDANDO”
-        await new Promise(r => setTimeout(r, 220));
-
-        const gate = modalGatePicker.selectedValue;
-        const parking = modalParkingPicker.selectedValue;
+        const gate = modalGatePicker.selectedValue;        // 0..12
+        const parking = modalParkingPicker.selectedValue;  // 7..24
         const id = document.getElementById('editId').value;
 
         if (id) {
@@ -1136,20 +813,15 @@
           entries = entries.map(x => (x.id === id ? { ...x, gate, parking } : x));
           // 1 por parking (excepto el editado)
           entries = entries.filter(x => x.id === id || x.parking !== parking);
-          lastUpdatedId = id;
         } else {
           // Crear (nuevo arriba)
           const nid = newId();
           entries = entries.filter(x => x.parking !== parking);
           entries.unshift({ id: nid, gate, parking, createdAt: Date.now() });
-          lastCreatedId = nid;
         }
 
         saveData();
         renderList();
-        setSavedState();
-
-        await new Promise(r => setTimeout(r, 520));
         closeModal();
       });
     });
