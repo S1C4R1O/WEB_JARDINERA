@@ -109,8 +109,10 @@
       width: 100%;
     }
 
+    /* ✅ Ajuste: baja el título en iPhone (Dynamic Island / notch) */
     header {
-      padding: 1.5rem 0 0.75rem;
+      padding-top: calc(2.4rem + env(safe-area-inset-top));
+      padding-bottom: 0.75rem;
       text-align: center;
     }
 
@@ -465,7 +467,8 @@
       <form id="editForm">
         <div class="modal-pickers-row">
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
+            <label
+              style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Puerta
             </label>
             <div class="modal-picker-item" id="modalGateContainer">
@@ -475,7 +478,8 @@
           </div>
 
           <div style="display:flex; flex-direction:column; gap:0.3rem">
-            <label style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
+            <label
+              style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; text-align: center; font-weight:900;">
               Parking
             </label>
             <div class="modal-picker-item" id="modalParkContainer">
